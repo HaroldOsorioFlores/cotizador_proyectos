@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cotizador online para proyectos web</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js" referrerpolicy="no-referrer"></script>
+  <script src="assets/js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="min-h-screen font-sans antialiased">
+  <header class="sticky top-0 z-40 border-b border-slate-200/80 glass">
+    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div class="flex items-center gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl accent-bg text-lg font-black text-white shadow-soft">C</div>
+        <div>
+          <p class="text-sm font-black tracking-tight text-slate-950">Cotizador Web Pro</p>
+          <p class="text-xs font-medium text-slate-500">Presupuesto, alcance, cronograma y PDF corporativo</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-2">
+          <span class="pl-2 text-xs font-bold text-slate-500">Color</span>
+          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-blue-600 ring-2 ring-offset-2" data-color="#2563eb" aria-label="Tema azul"></button>
+          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-emerald-600" data-color="#059669" aria-label="Tema verde"></button>
+          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-violet-600" data-color="#7c3aed" aria-label="Tema violeta"></button>
+          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-sky-500" data-color="#0284c7" aria-label="Tema celeste"></button>
+          <input id="customColor" type="color" value="#2563eb" class="h-7 w-8 cursor-pointer rounded-full border-0 bg-transparent" aria-label="Color personalizado" />
+        </div>
+        <button id="importJsonTopBtn" type="button" class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Importar JSON</button>
+        <button id="pdfBtn" type="button" class="rounded-full accent-bg px-5 py-3 text-sm font-black text-white shadow-soft transition hover:opacity-95">Generar PDF pro</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+    <section data-od-id="hero" class="mb-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+      <div class="card overflow-hidden p-7 sm:p-9">
+        <div class="mb-5 flex flex-wrap gap-2">
+          <span class="pill">Una página</span>
+          <span class="pill">PDF con librería</span>
+          <span class="pill">Plan por etapas</span>
+          <span class="pill">Alcance por ítem</span>
+        </div>
+        <h1 class="max-w-3xl text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">Cotiza proyectos web con estructura comercial real y un PDF elegante para enviar al cliente.</h1>
+        <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Carga tus datos como proveedor, datos del cliente, ítems con descripción, fechas, entregables por etapa y formas de pago. El PDF final se genera como documento corporativo, no como captura de la web.</p>
+      </div>
+      <aside class="card soft-panel p-7 sm:p-9">
+        <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Vista rápida</p>
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-slate-500">Ítems</p>
+            <p id="itemCount" class="number mt-1 text-2xl font-black text-slate-950">0</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-slate-500">Etapas</p>
+            <p id="weekCount" class="number mt-1 text-2xl font-black text-slate-950">0</p>
+          </div>
+          <div class="col-span-2 rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-slate-500">Total cotizado</p>
+            <p id="heroTotal" class="number mt-1 text-3xl font-black accent-text">S/ 0.00</p>
+          </div>
+        </div>
+        <p id="clientPreview" class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-600">Completa el cliente para personalizar la cotización.</p>
+      </aside>
+    </section>
+
+    <div class="grid gap-8 lg:grid-cols-[1fr_390px] lg:items-start">
+      <div class="space-y-8">
+        <section data-od-id="parties" class="card p-7 sm:p-9">
+          <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Datos comerciales</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Proveedor y cliente</h2>
+              <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Completa primero tus datos y luego los del cliente. Esta información se usa en la carátula y encabezado del PDF corporativo.</p>
+            </div>
+            <button type="button" class="clear-section-btn icon-btn danger shrink-0" data-section="commercial" data-tooltip="Limpiar datos comerciales" title="Limpiar datos comerciales" aria-label="Limpiar datos comerciales">×</button>
+          </div>
+          <div class="grid gap-7">
+            <div class="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-6 sm:p-7">
+              <h3 class="mb-6 text-sm font-black text-slate-800">Tus datos como proveedor</h3>
+              <div class="grid gap-x-6 gap-y-6 md:grid-cols-2">
+                <div>
+                  <label class="label" for="providerName">Nombre completo / razón social</label>
+                  <input id="providerName" class="field" placeholder="Ej. Gonzalo Rivera" />
+                </div>
+                <div>
+                  <label class="label" for="providerBrand">Nombre comercial</label>
+                  <input id="providerBrand" class="field" placeholder="Ej. Studio Web Pro" />
+                </div>
+                <div>
+                  <label class="label" for="providerRuc">RUC / documento opcional</label>
+                  <input id="providerRuc" class="field" placeholder="Opcional" />
+                </div>
+                <div>
+                  <label class="label" for="providerEmail">Correo</label>
+                  <input id="providerEmail" type="email" class="field" placeholder="correo@proveedor.com" />
+                </div>
+                <div>
+                  <label class="label" for="providerPhone">Teléfono</label>
+                  <input id="providerPhone" class="field" placeholder="+51 999 999 999" />
+                </div>
+                <div>
+                  <label class="label" for="providerAddress">Dirección / ciudad</label>
+                  <input id="providerAddress" class="field" placeholder="Lima, Perú" />
+                </div>
+              </div>
+            </div>
+            <div class="rounded-[1.35rem] border border-slate-200 bg-white p-6 sm:p-7">
+              <h3 class="mb-6 text-sm font-black text-slate-800">Datos del cliente</h3>
+              <div class="grid gap-x-6 gap-y-6 md:grid-cols-2">
+                <div>
+                  <label class="label" for="clientName">Cliente / razón social</label>
+                  <input id="clientName" class="field" placeholder="Ej. Inversiones Andina S.A.C." />
+                </div>
+                <div>
+                  <label class="label" for="clientRuc">RUC / documento opcional</label>
+                  <input id="clientRuc" class="field" placeholder="Opcional" />
+                </div>
+                <div>
+                  <label class="label" for="contactName">Contacto</label>
+                  <input id="contactName" class="field" placeholder="Responsable del proyecto" />
+                </div>
+                <div>
+                  <label class="label" for="contactEmail">Correo / teléfono</label>
+                  <input id="contactEmail" class="field" placeholder="correo@empresa.com · +51..." />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="label" for="clientAddress">Dirección / ciudad opcional</label>
+                  <input id="clientAddress" class="field" placeholder="Opcional" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-od-id="finance" class="card p-6 sm:p-8">
+          <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Configuración</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Divisa, impuestos y documento</h2>
+            </div>
+            <div class="flex gap-2 sm:justify-end">
+              <button type="button" class="clear-section-btn icon-btn danger" data-section="finance" data-tooltip="Limpiar configuración" title="Limpiar configuración" aria-label="Limpiar configuración">×</button>
+              <button id="resetBtn" type="button" class="icon-btn" data-tooltip="Reiniciar ejemplo" title="Reiniciar ejemplo" aria-label="Reiniciar ejemplo">↺</button>
+            </div>
+          </div>
+          <div class="grid gap-5 md:grid-cols-4">
+            <div>
+              <label class="label" for="quoteCode">Código de cotización</label>
+              <input id="quoteCode" class="field" value="COT-WEB-001" />
+            </div>
+            <div>
+              <label class="label" for="issueDate">Fecha de emisión</label>
+              <input id="issueDate" type="date" class="field" />
+            </div>
+            <div>
+              <label class="label" for="currency">Divisa</label>
+              <select id="currency" class="field">
+                <option value="PEN">Soles peruanos (S/)</option>
+                <option value="USD">Dólares (US$)</option>
+                <option value="EUR">Euros (€)</option>
+              </select>
+            </div>
+            <div>
+              <label class="label" for="validity">Validez de oferta</label>
+              <input id="validity" class="field" value="15 días calendario" />
+            </div>
+            <div>
+              <label class="label" for="taxRate">IGV / impuesto (%)</label>
+              <input id="taxRate" type="number" min="0" step="0.01" class="field" value="18" />
+            </div>
+            <div>
+              <label class="label" for="discountRate">Descuento (%)</label>
+              <input id="discountRate" type="number" min="0" step="0.01" class="field" value="0" />
+            </div>
+            <div>
+              <label class="label" for="advanceAmount">Abono inicial opcional (S/)</label>
+              <input id="advanceAmount" type="number" min="0" step="0.01" class="field" value="0" placeholder="Ej. 1000" />
+            </div>
+            <div class="md:col-span-3">
+              <label class="label" for="paymentMode">Forma de pago</label>
+              <select id="paymentMode" class="field">
+                <option value="upfront">Pago completo al inicio</option>
+                <option value="advance_balance" selected>Abono inicial y saldo final</option>
+                <option value="final">Pago completo al final</option>
+                <option value="deliverable">Pago por entregable</option>
+                <option value="weekly">Pago por etapas</option>
+              </select>
+            </div>
+            <div class="md:col-span-4">
+              <label class="label" for="terms">Condiciones comerciales</label>
+              <textarea id="terms" class="field min-h-[86px]">Incluye una ronda de ajustes por entregable, capacitación básica y entrega de accesos. No incluye compra de dominio, hosting, licencias externas ni contenido final salvo que se especifique en los ítems.</textarea>
+            </div>
+          </div>
+        </section>
+
+        <section id="jsonImportSection" data-od-id="json-import" class="card p-6 sm:p-8">
+          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Importación rápida</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Importar datos desde JSON generado por IA</h2>
+              <p class="mt-1 text-sm leading-6 text-slate-500">Copia el prompt, pégalo en la IA que uses y luego pega aquí el JSON. El cotizador llenará automáticamente los campos principales, ítems, alcance y cronograma.</p>
+            </div>
+            <button id="copyPromptBtn" class="text-action-btn self-start md:self-center" type="button">Copiar prompt</button>
+          </div>
+          <div class="grid gap-5 lg:grid-cols-2">
+            <div>
+              <label class="label" for="aiPromptText">Prompt para pedir el JSON</label>
+              <textarea id="aiPromptText" class="field min-h-[360px] font-mono text-xs leading-5" readonly>Actúa como consultor comercial para proyectos web. Devuélveme SOLO un JSON válido, sin markdown, sin comentarios y sin texto adicional, para importar una cotización en un cotizador web.
+
+Usa exactamente esta estructura y rellena valores realistas según mi descripción del proyecto. El contenido debe estar escrito para clientes no técnicos: explica el alcance, entregables, exclusiones y condiciones con lenguaje comercial claro, sin jerga innecesaria ni términos demasiado técnicos.
+
+Si mi prompt menciona ciudad, país o mercado objetivo, úsalo como referencia para estimar una cotización más precisa. Considera rangos aproximados del mercado local de esa ciudad para servicios web similares, complejidad del proyecto, moneda habitual, impuestos aplicables si se mencionan y nivel profesional esperado. Si no tienes certeza de precios locales, usa una estimación prudente y explícala en los textos de alcance o condiciones sin inventar fuentes, métricas ni promesas falsas.
+
+{
+  "proveedor": {
+    "nombre": "Nombre completo o razón social del proveedor",
+    "marca": "Nombre comercial opcional",
+    "ruc": "RUC o documento opcional",
+    "correo": "correo@proveedor.com",
+    "telefono": "+51 999 999 999",
+    "direccion": "Ciudad, país"
+  },
+  "cliente": {
+    "nombre": "Nombre o razón social del cliente",
+    "ruc": "RUC o documento opcional",
+    "contacto": "Persona responsable",
+    "correoTelefono": "correo o teléfono",
+    "direccion": "Dirección opcional"
+  },
+  "documento": {
+    "codigo": "COT-WEB-001",
+    "fechaEmision": "YYYY-MM-DD",
+    "divisa": "PEN",
+    "validez": "15 días calendario",
+    "impuestoPorcentaje": 18,
+    "descuentoPorcentaje": 0,
+    "abonoInicial": 0,
+    "formaPago": "advance_balance",
+    "condiciones": "Condiciones comerciales claras. No incluir soporte como concepto cotizable."
+  },
+  "proyecto": {
+    "nombre": "Nombre del proyecto",
+    "tipo": "Landing page | Web corporativa | E-commerce | Sistema web | Dashboard / herramienta interna | Optimización / mejora evolutiva",
+    "fechaInicio": "YYYY-MM-DD",
+    "plazo": 4,
+    "unidadPlazo": "weeks",
+    "alcanceGeneral": "Resumen del alcance, entregables, exclusiones y dependencias."
+  },
+  "items": [
+    {
+      "concepto": "Nombre del ítem",
+      "descripcion": "Qué incluye este ítem y sus límites.",
+      "cantidad": 1,
+      "precio": 1200,
+      "tipo": "Estrategia | Diseño | Desarrollo | Integración | Licencia | Contenido"
+    }
+  ],
+  "cronograma": [
+    {
+      "etapa": 1,
+      "fecha": "YYYY-MM-DD",
+      "entregable": "Qué se entregará en esta etapa",
+      "abono": 0
+    }
+  ]
+}
+
+Valores permitidos y reglas:
+- divisa: PEN, USD o EUR.
+- formaPago: upfront, advance_balance, final, deliverable o weekly. Usa weekly cuando el pago sea por etapas.
+- unidadPlazo: days o weeks.
+- abonoInicial siempre debe ser monto fijo, no porcentaje.
+- Redacta conceptos, descripciones, alcance general, entregables y condiciones para que un cliente no técnico entienda qué está pagando.
+- Ajusta precios, plazos y cronograma por etapas a la ciudad o mercado indicado por el usuario cuando exista esa información.
+- Si falta información, usa texto breve y honesto, no inventes métricas exageradas, fuentes ni garantías.</textarea>
+            </div>
+            <div>
+              <label class="label" for="jsonInput">JSON para importar</label>
+              <textarea id="jsonInput" class="field min-h-[360px] font-mono text-xs leading-5" placeholder='Pega aquí el JSON generado por la IA. Ejemplo: { "proveedor": { "nombre": "..." }, "items": [...] }'></textarea>
+              <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button id="importJsonBtn" class="rounded-full accent-bg px-5 py-3 text-sm font-black text-white transition hover:opacity-95" type="button">Importar y rellenar cotización</button>
+                <p id="jsonImportNotice" class="hidden text-sm font-bold text-emerald-700">JSON importado correctamente.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section data-od-id="items" class="card overflow-hidden p-6 sm:p-8">
+          <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Primero define qué se cotiza</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Ítems, precios y alcance opcional</h2>
+              <p class="mt-1 text-sm text-slate-500">Cada ítem puede incluir una descripción de alcance para que el PDF explique qué cubre el precio.</p>
+            </div>
+            <div class="section-actions self-start md:self-center md:shrink-0">
+              <button id="addItemBtn" type="button" class="text-action-btn" title="Agregar ítem" aria-label="Agregar ítem">Agregar ítem</button>
+              <button id="duplicateBtn" type="button" class="icon-btn" data-tooltip="Duplicar último ítem" title="Duplicar último ítem" aria-label="Duplicar último ítem">⧉</button>
+              <button type="button" class="clear-section-btn icon-btn danger" data-section="items" data-tooltip="Limpiar ítems" title="Limpiar ítems" aria-label="Limpiar ítems">×</button>
+            </div>
+          </div>
+          <div class="hidden rounded-xl bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 lg:grid lg:grid-cols-[1.25fr_.55fr_.72fr_.72fr_.82fr_auto] lg:gap-3">
+            <span>Concepto</span><span>Cant.</span><span>Precio</span><span>Tipo</span><span>Total</span><span>Acciones</span>
+          </div>
+          <div id="itemsList" class="mt-4 space-y-4"></div>
+        </section>
+
+        <section data-od-id="project" class="card p-6 sm:p-8">
+          <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Después de los ítems</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Alcance general, fechas y entregables</h2>
+            </div>
+            <button type="button" class="clear-section-btn icon-btn danger shrink-0" data-section="project" data-tooltip="Limpiar alcance y fechas" title="Limpiar alcance y fechas" aria-label="Limpiar alcance y fechas">×</button>
+          </div>
+          <div class="grid gap-5 md:grid-cols-4">
+            <div class="md:col-span-2">
+              <label class="label" for="projectName">Nombre del proyecto</label>
+              <input id="projectName" class="field" placeholder="Ej. Web corporativa + cotizador" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="label" for="projectType">Tipo de proyecto</label>
+              <select id="projectType" class="field">
+                <option>Landing page</option>
+                <option>Web corporativa</option>
+                <option>E-commerce</option>
+                <option>Sistema web</option>
+                <option>Dashboard / herramienta interna</option>
+                <option>Optimización / mejora evolutiva</option>
+              </select>
+            </div>
+            <div>
+              <label class="label" for="startDate">Fecha de inicio</label>
+              <input id="startDate" type="date" class="field" />
+            </div>
+            <div>
+              <label class="label" for="durationQty">Plazo</label>
+              <input id="durationQty" type="number" min="1" step="1" class="field" value="4" />
+            </div>
+            <div>
+              <label class="label" for="durationUnit">Unidad</label>
+              <select id="durationUnit" class="field">
+                <option value="days">Días</option>
+                <option value="weeks" selected>Semanas</option>
+              </select>
+            </div>
+            <div>
+              <label class="label" for="endDate">Fecha final automática</label>
+              <input id="endDate" type="date" class="field bg-slate-50" readonly />
+            </div>
+            <div class="md:col-span-4">
+              <label class="label" for="scope">Alcance general del proyecto</label>
+              <textarea id="scope" class="field min-h-[124px]" placeholder="Resume objetivos, pantallas, integraciones, entregables, capacitación, dependencias y exclusiones principales."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section data-od-id="schedule" class="card p-6 sm:p-8">
+          <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Plan de ejecución</p>
+              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Cronograma por etapas y pagos</h2>
+              <p class="mt-1 text-sm text-slate-500">Organiza la ejecución por etapas. Puedes indicar qué se entregará, la fecha estimada y cuánto se abonará en cada hito.</p>
+            </div>
+            <div class="section-actions self-start md:self-center md:shrink-0">
+              <button id="addScheduleStageBtn" type="button" class="text-action-btn" title="Agregar etapa" aria-label="Agregar etapa">Agregar etapa</button>
+              <button id="distributeScheduleBtn" type="button" class="text-action-btn" title="Distribuir pagos" aria-label="Distribuir pagos">Distribuir pagos</button>
+              <button id="syncScheduleBtn" type="button" class="icon-btn" data-tooltip="Sincronizar etapas" title="Sincronizar etapas" aria-label="Sincronizar etapas">↻</button>
+              <button type="button" class="clear-section-btn icon-btn danger" data-section="schedule" data-tooltip="Limpiar cronograma" title="Limpiar cronograma" aria-label="Limpiar cronograma">×</button>
+            </div>
+          </div>
+          <div id="scheduleHelp" class="mb-4 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm font-semibold text-blue-800">El abono inicial siempre se considera aparte si lo completas. Para pagos por entregable o por etapas, usa el cronograma para definir qué se entrega y cuánto se abona en cada hito.</div>
+          <div class="hidden rounded-xl bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 lg:grid lg:grid-cols-[.6fr_.95fr_1.35fr_.72fr_auto] lg:gap-3">
+            <span>Etapa</span><span>Fecha</span><span>Entregable</span><span>Abono</span><span></span>
+          </div>
+          <div id="scheduleList" class="mt-4 space-y-4"></div>
+        </section>
+      </div>
+
+      <aside data-od-id="summary" class="card sticky top-28 p-6 sm:p-7 summary-scroll">
+        <div class="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Resumen</p>
+            <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Resultado final</h2>
+          </div>
+          <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Editable</span>
+        </div>
+
+        <div class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Subtotal</span><strong id="subtotal" class="number text-slate-950">S/ 0.00</strong></div>
+          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Descuento</span><strong id="discount" class="number text-slate-950">S/ 0.00</strong></div>
+          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Base imponible</span><strong id="taxable" class="number text-slate-950">S/ 0.00</strong></div>
+          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Impuesto</span><strong id="tax" class="number text-slate-950">S/ 0.00</strong></div>
+          <div class="my-2 h-px bg-slate-200"></div>
+          <div class="flex items-end justify-between gap-3"><span class="text-sm font-bold text-slate-600">Total cotizado</span><strong id="grandTotal" class="number text-3xl font-black accent-text">S/ 0.00</strong></div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-slate-500">Abono inicial</p>
+            <p id="advance" class="number mt-1 text-lg font-black text-slate-950">S/ 0.00</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4">
+            <p class="text-xs font-bold text-slate-500">Saldo</p>
+            <p id="balance" class="number mt-1 text-lg font-black text-slate-950">S/ 0.00</p>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+          <p class="text-xs font-bold text-slate-500">Entrega estimada</p>
+          <p id="deliveryPreview" class="mt-1 text-sm font-black text-slate-950">Define fecha de inicio y plazo.</p>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div class="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[.16em] text-slate-400">Datos guardados</p>
+              <p class="mt-1 text-sm font-bold text-slate-700">Elige qué conservar en este equipo.</p>
+            </div>
+            <span id="cacheState" class="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500">Sin guardar</span>
+          </div>
+          <div class="grid gap-2 text-sm font-bold text-slate-600">
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input id="cacheAll" type="checkbox" class="h-4 w-4 accent-[var(--accent)]" checked /> Todo</label>
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="commercial" checked /> Datos comerciales</label>
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="finance" checked /> Divisa e impuestos</label>
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="items" checked /> Ítems</label>
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="project" checked /> Alcance y fechas</label>
+            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="schedule" checked /> Etapas y pagos</label>
+          </div>
+          <button id="saveCacheBtn" type="button" class="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Guardar selección</button>
+          <p id="cacheNotice" class="mt-3 hidden text-center text-sm font-bold text-emerald-700">Datos guardados.</p>
+        </div>
+
+        <div class="mt-5 space-y-3">
+          <button id="copyBtn" type="button" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Copiar resumen</button>
+          <button id="pdfBtnAside" type="button" class="w-full rounded-2xl accent-bg px-4 py-3 text-sm font-black text-white transition hover:opacity-95">Generar PDF corporativo</button>
+          <p id="copyNotice" class="hidden text-center text-sm font-bold text-emerald-700">Resumen copiado.</p>
+          <p id="pdfNotice" class="hidden rounded-2xl bg-emerald-50 p-3 text-center text-sm font-bold text-emerald-700">PDF generado correctamente.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/20 px-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-soft">
+      <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Confirmar limpieza</p>
+      <h2 id="modalTitle" class="mt-2 text-xl font-black tracking-tight text-slate-950">Limpiar sección</h2>
+      <p id="modalText" class="mt-2 text-sm leading-6 text-slate-500">Se limpiarán los datos visibles y los datos guardados de esta sección.</p>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <button id="cancelClearBtn" type="button" class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700">Cancelar</button>
+        <button id="confirmClearBtn" type="button" class="rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white">Limpiar datos</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/items.js"></script>
+  <script src="assets/js/schedule.js"></script>
+  <script src="assets/js/summary.js"></script>
+  <script src="assets/js/import.js"></script>
+  <script src="assets/js/pdf.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
