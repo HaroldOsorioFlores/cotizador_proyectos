@@ -40,7 +40,7 @@ assets/js/summary.js        Cálculo, pagos y checklist
 assets/js/import.js         Drawer de importación, validación y portapapeles
 assets/js/pdf.js            Generación del PDF
 assets/js/app.js            Inicialización y listeners
-AGENTS.md                   Reglas de trabajo del repositorio
+AGENTS.md                   Reglas internas (local, no publicado)
 README.md                   Este archivo
 .gitignore                  Exclusiones de Git
 plans/                      Planificación interna
@@ -53,10 +53,11 @@ docs/superpowers/plans/     Planes de implementación (local)
 
 ## Archivos locales y Git
 
-Por recomendación, `plans/`, `docs/superpowers/plans/`, `.mcp.json` y `opencode.json` están en `.gitignore` para no agregar archivos nuevos al repositorio.
+Por recomendación, `AGENTS.md`, `plans/`, `docs/superpowers/plans/`, `.mcp.json` y `opencode.json` se mantienen fuera del repositorio y están en `.gitignore`.
 
-- `.mcp.json` y `opencode.json`: configuración local de Playwright MCP y opencode; no están rastreados. Cada colaborador debe crear la suya siguiendo `AGENTS.md`, sección 7.0.
-- `plans/` y `docs/superpowers/plans/`: planificación interna. Los archivos que ya estaban rastreados siguen en Git hasta que se retiren del índice; `.gitignore` solo evita agregar nuevos.
+- `AGENTS.md`: reglas internas de trabajo; se mantiene local y no se publica.
+- `.mcp.json` y `opencode.json`: configuración local de Playwright MCP y opencode. Cada colaborador debe crear la suya siguiendo la guía interna de `AGENTS.md`, sección 7.0.
+- `plans/` y `docs/superpowers/plans/`: planificación interna; no forma parte del repositorio publicado.
 - `.agents/skills/` y `.claude/`: skills y configuración local del asistente.
 
 La aplicación funciona sin estos archivos. La documentación funcional de `docs/funcionalidades/` sí forma parte del repositorio.
@@ -76,7 +77,7 @@ Los datos comerciales y de contacto se guardan únicamente en el navegador del u
 
 ## Verificación
 
-No hay una suite de tests automatizada. La verificación principal es manual en navegador con Playwright MCP y la consola abierta; la checklist está en `AGENTS.md` (sección 7). El historial de pruebas se mantiene en `plans/05-bitacora-ejecucion.md` y no se incluye en estos commits.
+No hay una suite de tests automatizada. La verificación principal es manual en navegador con Playwright MCP y la consola abierta; la checklist interna está en `AGENTS.md` (local, no publicado). El historial de pruebas se mantiene en `plans/05-bitacora-ejecucion.md` (local, no publicado).
 
 Comprobaciones locales rápidas:
 
@@ -89,8 +90,8 @@ Abrir `http://127.0.0.1:8765/index.html` con Playwright MCP y comprobar los valo
 
 ## Documentación
 
-- Reglas de trabajo: `AGENTS.md`
+- Reglas de trabajo: `AGENTS.md` (local, no publicado)
 - Documentación funcional: `docs/funcionalidades/`
 - Sistema visual: `docs/diseno/sistema-visual.md`
-- Trazabilidad y auditoría: `plans/` (no incluido en estos commits)
-- Plan de la iteración editorial: `docs/superpowers/plans/2026-11-07-quoter-editorial-multi-domain.md` (local, no incluido)
+- Trazabilidad y auditoría: `plans/` (local, no publicado)
+- Plan de la iteración editorial: `docs/superpowers/plans/2026-11-07-quoter-editorial-multi-domain.md` (local, no publicado)
