@@ -6,13 +6,13 @@ Fecha: 2026-11-07
 
 | Comprobación | Resultado | Evidencia |
 |---|---|---|
-| Repositorio Git | Inicializado y publicado al cierre de esta tarea | Ver `plans/05-bitacora-ejecucion.md` |
+| Repositorio Git | Inicializado y publicado | `main` → <https://github.com/HaroldOsorioFlores/cotizador_proyectos> |
 | Gestor de paquetes | No existe | Sin `package.json`, `pnpm-lock.yaml` ni `node_modules` |
 | Build | No existe | La app se abre directamente desde `index.html` |
 | Backend / API | No existe | Todo el código está en el navegador |
 | Base de datos | No existe | Persistencia en `localStorage` |
 | Tests automatizados | No existen | Smoke check headless local, sin framework |
-| CI / despliegue | GitHub Pages | Publicación estática desde `main` |
+| CI / despliegue | GitHub Pages | Publicación estática desde `main` en <https://haroldosorioflores.github.io/cotizador_proyectos/> |
 
 ## Dependencias externas
 

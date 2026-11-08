@@ -10,6 +10,12 @@ Aplicación web estática de una sola página para crear cotizaciones de proyect
 
 También puede servirse desde cualquier hosting estático (GitHub Pages, Netlify, servidor local). La generación de PDF y la persistencia son locales al navegador.
 
+## Publicación
+
+- Repositorio: <https://github.com/HaroldOsorioFlores/cotizador_proyectos>
+- GitHub Pages: <https://haroldosorioflores.github.io/cotizador_proyectos/>
+- Rama de publicación: `main`, raíz del repositorio.
+
 ## Funcionalidades
 
 - Datos comerciales de proveedor y cliente.
@@ -40,7 +46,8 @@ README.md                   Este archivo
 .gitignore                  Exclusiones de Git
 plans/                      Inventario, auditoría, plan y bitácora
 docs/funcionalidades/       Documentación funcional del cotizador
-.agents/skills/             Skills locales aplicables al proyecto
+.agents/skills/             Skills locales aplicables (ignoradas por Git)
+.claude/                    Configuración local del asistente (ignorada por Git)
 ```
 
 ## Dependencias externas

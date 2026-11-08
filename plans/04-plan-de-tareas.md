@@ -17,7 +17,7 @@ Fecha: 2026-11-07
 | T-21 | Extraer `core`, `items`, `schedule` y `summary` | Funciones completas, sin duplicados y con orden de carga correcto | `node --check` OK | Hecho |
 | T-22 | Extraer `import`, `pdf` y `app` | `index.html` sin JS inline; `init()` al final de `app.js` | `node --check` OK y DOM headless OK | Hecho |
 | T-23 | Verificar regresión del refactor | Sintaxis y valores base idénticos al baseline | `tmp/after-refactor.html` + `tmp/after-refactor.png` | Hecho |
-| T-24 | Publicar en GitHub y GitHub Pages | `main` pusheada, Pages activo y URL con HTTP 200 | Ver `plans/05-bitacora-ejecucion.md` | Pendiente |
+| T-24 | Publicar en GitHub y GitHub Pages | `main` pusheada, Pages activo y URL con HTTP 200 | `main` → `origin`; Pages `built`; URL y assets 200; DOM live OK | Hecho |
 
 ## Backlog pendiente (requiere autorización para modificar `index.html`)
 

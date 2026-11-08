@@ -83,3 +83,24 @@ Entorno: Windows, PowerShell 5.1, Node v24.22.1, Microsoft Edge 157.0.4341.42 he
 
 - Los hallazgos AUD-01 a AUD-13 siguen abiertos; el refactor no corrigió comportamiento.
 - No se ejecutaron tests de interacción ni PDF automatizados.
+
+## 2026-11-07 — Git y GitHub Pages
+
+| Acción | Resultado real |
+|---|---|
+| `git init` | Repositorio local creado |
+| `git config user.name` / `user.email` | Identidad local: `HaroldOsorioFlores` / `HaroldOsorioFlores@users.noreply.github.com` |
+| `git add -A` | 25 archivos; `tmp/` y `.claude/` ignorados |
+| `git commit -m "first commit"` | `e2caffb` |
+| `git branch -M main` | Rama `main` creada |
+| `git remote add origin ...` | Remoto `HaroldOsorioFlores/cotizador_proyectos` |
+| `git push -u origin main` | Push correcto; `main` sigue a `origin/main` |
+| `gh api --method POST .../pages` | Pages creado desde `main` raíz; URL `https://haroldosorioflores.github.io/cotizador_proyectos/`; estado inicial `building` |
+| Verificación Pages | Estado `built`; `GET /` → 200 (31.178 bytes); CSS y los siete JS → 200; Edge headless live → `DOM OK` |
+| Rama de documentación | `docs/quoter-publish-pages` para el cierre documental |
+
+Notas:
+
+- `.agents/` y `.claude/` están ignorados por sus propios `.gitignore`; las skills son locales y no se publican.
+- La primera publicación se hizo con `main`; la documentación final se integra desde `docs/quoter-publish-pages`.
+- La URL de Pages y el estado del build se verifican al final de la tarea.
