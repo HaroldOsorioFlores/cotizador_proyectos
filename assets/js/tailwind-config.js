@@ -1,15 +1,18 @@
 if (window.tailwind) {
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
-          },
-          boxShadow: {
-            soft: '0 18px 55px rgba(15, 23, 42, 0.08)'
-          }
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Calistoga', 'Georgia', 'serif'],
+          body: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+          mono: ['JetBrains Mono', 'Consolas', 'monospace']
+        },
+        colors: {
+          paper: '#f7f4ee',
+          ink: '#171717',
+          line: '#e4ded2'
         }
       }
-    };
+    }
+  };
 }

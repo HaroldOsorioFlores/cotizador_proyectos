@@ -17,6 +17,15 @@ desktop.ini
 # Configuración local de asistentes
 .claude/settings.local.json
 
+# Configuración local de MCP/opencode (no se publica)
+.mcp.json
+mcp.json
+opencode.json
+
+# Planes y notas internas (no se publican)
+plans/
+docs/superpowers/plans/
+
 # Dependencias y artefactos de build (no existen hoy; prevención)
 node_modules/
 dist/
@@ -32,3 +41,12 @@ tmp/
 
 # PDFs generados por el cotizador
 *.pdf
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+
+# Artefactos de Playwright MCP
+.playwright/
+.playwright-mcp/
+
+
+AGENTS.md

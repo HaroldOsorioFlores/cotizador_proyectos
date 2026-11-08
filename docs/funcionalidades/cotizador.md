@@ -1,121 +1,151 @@
-# Funcionalidad: Cotizador Web Pro
+# Funcionalidad: Cotizador Pro
 
-Ubicación: `index.html` (archivo único).
-Actor: profesional que cotiza proyectos web.
-Estado: implementado y operativo según lectura de código; pendiente baseline visual en navegador.
+Ubicación: `index.html` + `assets/css/styles.css` + `assets/js/*.js`.
+Actor: profesional que cotiza proyectos digitales para un cliente.
+Estado: implementado y verificado con Playwright MCP el 2026-11-07.
 
 ## F-01 Datos comerciales
 
 - Objetivo: identificar proveedor y cliente en la cotización y el PDF.
-- Ubicación: sección `data-od-id="parties"` (`index.html (data-od-id="parties")`).
+- Ubicación: `#section-commercial` (`data-od-id="parties"`).
 - Campos proveedor: `providerName`, `providerBrand`, `providerRuc`, `providerEmail`, `providerPhone`, `providerAddress`.
 - Campos cliente: `clientName`, `clientRuc`, `contactName`, `contactEmail`, `clientAddress`.
-- Reglas: todos son texto libre; ninguno es obligatorio para calcular. `clientPreview` muestra cliente y RUC si existen (`assets/js/summary.js:21 (calculate)`).
-- Persistencia: sección `commercial` (`assets/js/core.js:22 (sectionFields)`).
-- Error/caso límite: acepta cualquier texto; no valida formato de correo, RUC ni teléfono.
-- Prueba manual: completar ambos bloques, verificar vista previa y PDF.
+- Reglas: texto libre con límites de longitud; ninguno es obligatorio para calcular. `clientPreview` muestra cliente y RUC si existen (`assets/js/summary.js:calculate`).
+- Persistencia: sección `commercial` (`assets/js/core.js:sectionFields`).
+- Prueba manual: completar ambos bloques, guardar, recargar y generar el PDF.
 
-## F-02 Configuración financiera
+## F-02 Documento y pago
 
-- Objetivo: definir documento, divisa, impuesto, descuento, abono y forma de pago.
-- Ubicación: sección `data-od-id="finance"` (`index.html (data-od-id="finance")`).
-- Campos: `quoteCode`, `issueDate`, `currency` (PEN/USD/EUR), `validity`, `taxRate`, `discountRate`, `advanceAmount`, `paymentMode`, `terms`.
-- Reglas de cálculo (`assets/js/core.js:240 (totals)`):
+- Objetivo: definir título, código, fecha, divisa, impuesto, descuento, abono y forma de pago.
+- Título: `quoteTitle` al inicio de la sección Documento y pago; controla la pestaña, el documento, el resumen, el texto copiado, el encabezado del PDF y el nombre de archivo de respaldo (`updateQuoteTitle`).
+- Campos: `quoteTitle`, `quoteCode`, `issueDate`, `currency` (PEN/USD/EUR), `validity`, `taxRate`, `discountRate`, `advanceAmount`, `paymentMode`, `terms`.
+- Reglas de cálculo (`assets/js/core.js:totals`):
   - Subtotal = Σ (cantidad × precio).
   - Descuento = subtotal × `discountRate` / 100.
   - Base imponible = max(0, subtotal − descuento).
   - Impuesto = base imponible × `taxRate` / 100.
   - Total = base imponible + impuesto.
-  - Abono = min(total, max(0, `advanceAmount`)).
-  - Saldo = total − abono.
-- Formas de pago (`assets/js/summary.js:1-19 (updatePaymentUi)`): `upfront`, `advance_balance`, `final`, `deliverable`, `weekly`.
-- Errores/casos límite: valores negativos se limitan en el cálculo, pero el input puede conservar el valor negativo. El JSON importado no valida números finitos. La etiqueta del abono dice “(S/)” aunque la divisa sea USD/EUR (`index.html (#advanceAmount)`).
-- Prueba manual: cambiar divisa e impuesto; revisar subtotal, descuento, total, abono y saldo.
+  - Abono efectivo según forma de pago (`effectiveAdvance`).
+- Formas de pago (`assets/js/summary.js:updatePaymentUi`):
+  - `upfront`: abono = total, saldo = 0; el campo de abono se desactiva.
+  - `advance_balance`: abono = monto ingresado; saldo = total − abono.
+  - `final`: abono = 0, saldo = total; el campo de abono se desactiva.
+  - `deliverable` y `weekly`: abono opcional; saldo = total − abono − abonos del cronograma.
+- Etiqueta de abono: se actualiza con el símbolo de la divisa (`updateAdvanceLabel`).
+- El impuesto es genérico; el texto de ayuda menciona IGV 18% como ejemplo peruano.
+- Persistencia: sección `finance`.
+- Prueba manual: cambiar divisa, impuesto y los cinco modos de pago; revisar abono/saldo y el aviso del cronograma.
 
 ## F-03 Ítems
 
 - Objetivo: desglosar el alcance y los precios.
-- Ubicación: sección `data-od-id="items"` (`index.html (data-od-id="items")`); render en `renderItems()` (`assets/js/items.js:1 (renderItems)`).
-- Campos por ítem: concepto, cantidad, precio, tipo, descripción/alcance.
-- Tipos: Estrategia, Diseño, Desarrollo, Integración, Licencia, Contenido.
+- Ubicación: `#section-items`; render en `renderItems()` (`assets/js/items.js`).
+- Campos por ítem: concepto, cantidad, precio, tipo libre con sugerencias y descripción/alcance.
+- Tipos sugeridos: Estrategia, Diseño, Desarrollo, Integración, Automatización, Pruebas, Despliegue, Licencia, Contenido, Otro.
 - Acciones: agregar, duplicar último, mover arriba/abajo, eliminar.
-- Reglas: total por ítem = cantidad × precio; el estado se guarda en `state.items` (`assets/js/core.js:1-9 (state.items)`).
-- Casos límite: cantidad/precio no numéricos se convierten a 0 en el cálculo; cantidades negativas no se bloquean en la UI.
-- Prueba manual: agregar, editar, mover, duplicar y eliminar; comprobar recálculo y PDF.
+- Reglas: total por ítem = cantidad × precio; el estado vive en `state.items`.
+- Estado vacío: mensaje con acciones para agregar o importar.
+- Prueba manual: agregar, editar, mover, duplicar y eliminar; comprobar recálculo, estado vacío y PDF.
 
 ## F-04 Proyecto y fechas
 
 - Objetivo: describir el proyecto y calcular la entrega.
-- Ubicación: sección `data-od-id="project"` (`index.html (data-od-id="project")`).
-- Campos: `projectName`, `projectType` (6 opciones), `startDate`, `durationQty`, `durationUnit` (days/weeks), `endDate` (solo lectura), `scope`.
-- Regla: `endDate` = inicio + (plazo × 7 si semanas, plazo si días) (`assets/js/schedule.js:98 (updateDeliveryPreview)`).
-- Casos límite: `toIsoDate` usa `toISOString` (UTC), lo que puede retroceder un día en zonas UTC+ (`assets/js/core.js:219-222 (toIsoDate)`). Fechas inválidas importadas muestran “Invalid Date”.
-- Prueba manual: cambiar inicio, plazo y unidad; verificar fecha final y vista previa.
+- Ubicación: `#section-project`.
+- Campos: `projectName`, `projectType` (input libre con `datalist`), `startDate`, `durationQty`, `durationUnit` (days/weeks), `endDate` (solo lectura), `scope`.
+- Regla: `endDate` = inicio + (plazo × 7 si semanas, plazo si días) (`updateDeliveryPreview`).
+- Fechas en hora local con `toIsoDate` basado en componentes locales; `formatDate` devuelve `—` para valores inválidos.
+- Prueba manual: cambiar inicio, plazo y unidad; verificar fecha final y cronograma.
 
 ## F-05 Cronograma por etapas
 
 - Objetivo: planificar entregables y abonos.
-- Ubicación: sección `data-od-id="schedule"` (`index.html (data-od-id="schedule")`); render en `renderSchedule()` (`assets/js/schedule.js:61 (renderSchedule)`).
-- Campos por etapa: número, fecha, entregable, abono.
-- Acciones: sincronizar etapas (`syncSchedule`), agregar etapa, distribuir pagos, eliminar etapa.
-- Reglas: `requiredWeeks()` deriva etapas del plazo (`assets/js/schedule.js:1 (requiredWeeks)`); la sincronización crea o recorta etapas y calcula fechas semanales (`assets/js/schedule.js:6 (syncSchedule)`); distribuir reparte total − abono entre etapas (`assets/js/schedule.js:119 (distributeSchedulePayments)`).
-- Casos límite: al reducir el plazo se recortan etapas; si los abonos superan el total, el saldo se limita a 0.
-- Prueba manual: sincronizar, agregar, distribuir y eliminar; revisar resumen y PDF.
+- Ubicación: `#section-schedule`; render en `renderSchedule()`.
+- Campos por etapa: número, fecha, entregable y abono.
+- Acciones: sincronizar etapas, agregar etapa, distribuir pagos, eliminar etapa; agrupadas en una cuadrícula 2×2 para que no se amontonen en tablet.
+- Reglas:
+  - `requiredStages()` deriva etapas del plazo (semanas o bloques de 7 días) y limita a 52 para no bloquear la interfaz.
+  - `syncSchedule(force)` crea o recorta etapas; la última fecha coincide con la fecha final.
+  - Las fechas manuales se conservan; `Sincronizar etapas` las recalcula.
+  - Si una etapa queda después de la fecha final, se muestra un aviso.
+  - `Distribuir pagos` reparte total − abono efectivo entre etapas.
+- Prueba manual: sincronizar, agregar, distribuir, editar fecha y eliminar; revisar avisos, resumen y PDF.
 
 ## F-06 Importación JSON y prompt
 
 - Objetivo: cargar una cotización completa desde JSON generado por IA.
-- Ubicación: sección `data-od-id="json-import"` (`index.html (data-od-id="json-import")`); lógica en `importJsonData()` (`assets/js/import.js:9-85 (importJsonData)`).
-- Entrada: `jsonInput`; prompt readonly en `aiPromptText`; botón “Copiar prompt”.
-- Estructura esperada: `proveedor`, `cliente`, `documento`, `proyecto`, `items`, `cronograma`; acepta alias en inglés.
-- Validaciones actuales: `JSON.parse`; divisa, forma de pago y unidad de plazo se limitan con `allowedValue`. No valida objeto raíz, números finitos/no negativos, fechas ni `projectType`.
-- Errores: JSON inválido muestra `alert` y no modifica el estado (`assets/js/import.js (parseo JSON)`).
-- Casos límite: `items` o `cronograma` con `null` pueden lanzar excepción; tipo de proyecto desconocido deja el select vacío.
-- Prueba manual: importar JSON válido, inválido y con valores fuera de catálogo.
+- Ubicación: panel lateral `#importDrawer`; lógica en `assets/js/import.js`.
+- Entrada: pestaña Prompt con `aiPromptText` y botón Copiar; pestaña JSON con `jsonInput` y botón Importar.
+- Estructura esperada: `documento` (con `titulo`), `proveedor`, `cliente`, `proyecto`, `items`, `cronograma`; acepta alias en inglés.
+- Validaciones:
+  - Raíz y subobjetos de tipo objeto; listas para ítems y cronograma.
+  - Cada ítem y etapa debe ser objeto.
+  - Números finitos y dentro de rangos; no se aceptan negativos.
+  - Fechas `YYYY-MM-DD` reales.
+  - Divisa, forma de pago y unidad de plazo dentro del catálogo.
+  - Tipo de proyecto libre, no vacío y con límite de longitud.
+  - Límites de longitud para textos.
+- Si hay errores: se muestra una lista, el foco va al bloque de error y no se muta el formulario.
+- La fecha del cronograma se valida y se escapa antes de renderizar.
+- Portapapeles: helper con `navigator.clipboard`, fallback `execCommand` y aviso de error controlado.
+- Prueba manual: JSON válido de app móvil, `items:[null]`, negativos, fecha inválida, divisa inválida y payload XSS.
 
 ## F-07 Persistencia local
 
 - Objetivo: conservar datos entre recargas.
-- Clave: `cotizador-web-pro-cache-v1` (`assets/js/core.js:13 (STORAGE_KEY)`).
-- Secciones: `commercial`, `finance`, `items`, `project`, `schedule` (`assets/js/core.js:15-26 (sectionLabels, sectionFields)`).
-- Guardado: `saveSelectedCache()` guarda solo las secciones marcadas (`assets/js/core.js:110 (saveSelectedCache)`).
-- Restauración: `loadSavedCache()` aplica campos, ítems, cronograma y color (`assets/js/core.js:126 (loadSavedCache)`).
-- Borrado: cada sección tiene un botón que abre el modal de confirmación y elimina también la copia guardada (`assets/js/core.js:176-198 (modal)`).
+- Clave: `cotizador-web-pro-cache-v1` (`assets/js/core.js`).
+- Secciones: `commercial`, `finance`, `items`, `project`, `schedule`.
+- Guardado: botón Guardar de la cabecera o Guardar selección del resumen; guarda solo las secciones marcadas y el acento.
+- Restauración: `loadSavedCache()` aplica campos, título, ítems, cronograma y color.
+- Borrado: cada sección tiene confirmación; `Borrar todos los datos` elimina la clave y reinicia el formulario.
+- El checkbox Todo se sincroniza al marcar, desmarcar o limpiar secciones.
 - Privacidad: contiene nombres, RUC, correo, teléfono y dirección; no se envía a ningún servidor.
-- Casos límite: no hay caducidad ni borrado global; el checkbox “Todo” puede quedar desincronizado tras limpiar una sección.
-- Prueba manual: guardar selección, recargar, restaurar y limpiar una sección.
+- Prueba manual: guardar, recargar, restaurar, limpiar una sección y borrar todo.
 
 ## F-08 Generación de PDF
 
 - Objetivo: exportar una cotización corporativa.
-- Ubicación: `generatePdf()` (`assets/js/pdf.js:21 (generatePdf)`); botones `pdfBtn` y `pdfBtnAside`.
-- Contenido: portada, proyecto/entrega, cliente/proveedor, alcance/condiciones, ítems, resumen financiero y cronograma.
-- Dependencias: `window.jspdf.jsPDF` y `doc.autoTable`.
-- Error controlado: si jsPDF no cargó, muestra `alert` (`assets/js/pdf.js:22-25 (guard jsPDF)`).
-- Nombre de archivo: `quoteCode` saneado a `[a-z0-9_-]` (`assets/js/pdf.js:31 (fileSafeCode)`).
-- Casos límite: textos muy largos podrían desbordar la primera página; no hay manejo de excepción alrededor de `doc.save`.
-- Prueba manual: generar con ítems, sin ítems y con textos largos; verificar totales y nombre.
+- Ubicación: `generatePdf()` (`assets/js/pdf.js`); botones `pdfBtn`, `pdfBtnAside` y `mobilePdfBtn`.
+- Contenido:
+  - Página 1: título editable, código, fecha, validez, total, proyecto/entrega, cliente/proveedor y alcance/condiciones.
+  - Página 2: ítems, resumen financiero, cronograma y condiciones si aplica.
+- Tipografía: Times para títulos y Helvetica para cuerpo; acento del tema.
+- Metadatos: título, proyecto, autor/proveedor y creador.
+- Nombre de archivo: código saneado o nombre del proyecto/título como respaldo.
+- Error controlado: aviso si jsPDF no cargó; `try/catch` al guardar.
+- Casos verificados: con ítems, sin ítems, textos largos (más de 2000 caracteres), USD/EUR y sin avisos de AutoTable.
+- Prueba manual: generar en los tres escenarios y revisar título, totales, paginación y nombre.
 
 ## F-09 Copiar resumen
 
 - Objetivo: compartir un resumen textual.
-- Ubicación: `copySummary()` (`assets/js/import.js:106-124 (copySummary)`); botón `copyBtn`.
-- Contenido: código, proveedor, cliente, proyecto, entrega, subtotal, impuesto, total, abono y forma de pago.
-- Error: si `navigator.clipboard` no existe, `undefined.then` lanza excepción; no hay aviso de error.
-- Prueba manual: copiar en contexto seguro y en `file://`.
+- Ubicación: `copySummary()` (`assets/js/import.js`); botón `copyBtn`.
+- Contenido: título, código, proveedor, cliente, proyecto, entrega, subtotal, descuento, impuesto, total, abono, saldo y forma de pago.
+- Error: si el portapapeles no está disponible y el fallback falla, muestra `#copyError` sin excepción.
+- Prueba manual: copiar en contexto seguro y simular portapapeles bloqueado.
 
 ## F-10 Tema de color
 
 - Objetivo: personalizar el acento visual y el PDF.
-- Ubicación: header (`index.html (header, controles de color)`); `updateAccent()` (`assets/js/core.js:230 (updateAccent)`).
-- Controles: cuatro colores predefinidos y selector personalizado.
-- Persistencia: el color se guarda con la caché y se restaura al cargar.
+- Controles: cuatro temas (bosque, tinta, terracota, cobalto) y selector personalizado.
+- `updateAccent()` actualiza `--accent`, `--accent-soft`, el valor del selector y `aria-pressed`.
+- Persistencia: al elegir un tema o un color personalizado se guarda el acento de inmediato en `localStorage`; también se incluye al guardar la selección.
+- PDF: usa el acento seleccionado en barra superior, total, títulos de sección, cabecera de ítems, cabecera del cronograma y fila de total.
 - Prueba manual: cambiar color, recargar y generar PDF.
 
-## F-11 Limpieza de secciones y modal
+## F-11 Diálogos accesibles
 
-- Objetivo: borrar datos visibles y su copia local con confirmación.
-- Ubicación: botones `.clear-section-btn`; modal `#confirmModal` (`index.html (#confirmModal)`); lógica (`assets/js/core.js:176-198 (modal)`).
-- Comportamiento: abre modal con título de sección; “Cancelar” cierra; “Limpiar datos” borra campos, estado y caché; clic en el fondo cierra.
-- Accesibilidad actual: sin `role="dialog"`, `aria-modal`, foco inicial, trampa de foco ni cierre con `Escape`.
-- Prueba manual: abrir, cancelar, confirmar, cerrar con fondo y con teclado.
+- Objetivo: confirmar limpiezas y abrir la importación sin perder contexto.
+- Componentes: `#confirmModal` y `#importDrawer`, ambos con `role="dialog"`, `aria-modal="true"`, título/descripción asociados, foco inicial, trampa de foco, cierre con Escape y clic en el fondo.
+- Al cerrar, el foco vuelve al disparador visible; si el disparador desapareció, vuelve al botón Importar de la cabecera.
+- Prueba manual: abrir, recorrer con Tab y Shift+Tab, cerrar con Escape y con el fondo.
+
+## F-12 Responsive y accesibilidad
+
+- Objetivo: usar la app en escritorio, tablet y móvil.
+- Puntos de quiebre verificados: 360, 768, 1024 y 1440 px sin scroll horizontal.
+- La cabecera solo contiene marca y acciones; el título y su estado viven en Documento y pago.
+- Barra inferior móvil con total, Resumen y PDF.
+- El resumen es sticky desde 1024 px (`top: 90px`), con scroll interno y separación respecto a la cabecera.
+- Las cabeceras de sección se apilan hasta 1279 px para dar espacio a las acciones; el formulario usa 2 columnas en tablet y 4 solo desde 1280 px.
+- Foco visible, objetivos de 44 px, labels asociados, `aria-live` en totales y avisos, `prefers-reduced-motion`.
+- Prueba manual: recorrido solo con teclado y resize en los cuatro anchos.

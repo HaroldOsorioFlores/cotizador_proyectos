@@ -1,467 +1,596 @@
 <!doctype html>
-<html lang="es">
+<html lang='es'>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cotizador online para proyectos web</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js" referrerpolicy="no-referrer"></script>
-  <script src="assets/js/tailwind-config.js"></script>
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <title>Cotizador Pro — Cotizaciones de proyectos digitales</title>
+  <meta name='description' content='Crea cotizaciones claras para proyectos web, móviles, automatización y software a medida. PDF generado en tu navegador.' />
+  <link rel='icon' type='image/svg+xml' href='assets/favicon.svg' />
+  <link rel='preconnect' href='https://fonts.googleapis.com' />
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
+  <link href='https://fonts.googleapis.com/css2?family=Calistoga&amp;family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap' rel='stylesheet' />
+  <script src='https://cdn.tailwindcss.com'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js' referrerpolicy='no-referrer'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js' referrerpolicy='no-referrer'></script>
+  <script src='assets/js/tailwind-config.js'></script>
+  <link rel='stylesheet' href='assets/css/styles.css' />
 </head>
-<body class="min-h-screen font-sans antialiased">
-  <header class="sticky top-0 z-40 border-b border-slate-200/80 glass">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-      <div class="flex items-center gap-3">
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl accent-bg text-lg font-black text-white shadow-soft">C</div>
-        <div>
-          <p class="text-sm font-black tracking-tight text-slate-950">Cotizador Web Pro</p>
-          <p class="text-xs font-medium text-slate-500">Presupuesto, alcance, cronograma y PDF corporativo</p>
+<body>
+  <a class='skip-link' href='#main'>Saltar al contenido principal</a>
+
+  <header class='topbar'>
+    <div class='topbar-inner'>
+      <div class='brand-block'>
+        <div class='brand-mark' aria-hidden='true'>C</div>
+        <div class='brand-copy'>
+          <p class='brand-name'>Cotizador Pro</p>
+          <p class='brand-tagline'>Cotizaciones claras para proyectos digitales</p>
         </div>
       </div>
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-2">
-          <span class="pl-2 text-xs font-bold text-slate-500">Color</span>
-          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-blue-600 ring-2 ring-offset-2" data-color="#2563eb" aria-label="Tema azul"></button>
-          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-emerald-600" data-color="#059669" aria-label="Tema verde"></button>
-          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-violet-600" data-color="#7c3aed" aria-label="Tema violeta"></button>
-          <button type="button" class="theme-dot h-7 w-7 rounded-full bg-sky-500" data-color="#0284c7" aria-label="Tema celeste"></button>
-          <input id="customColor" type="color" value="#2563eb" class="h-7 w-8 cursor-pointer rounded-full border-0 bg-transparent" aria-label="Color personalizado" />
+      <div class='topbar-actions'>
+        <div class='color-control' role='group' aria-label='Color de acento'>
+          <button type='button' class='theme-dot is-active' data-color='#1f4d3a' aria-label='Tema bosque' aria-pressed='true'></button>
+          <button type='button' class='theme-dot' data-color='#1e293b' aria-label='Tema tinta' aria-pressed='false'></button>
+          <button type='button' class='theme-dot' data-color='#b45309' aria-label='Tema terracota' aria-pressed='false'></button>
+          <button type='button' class='theme-dot' data-color='#1d4ed8' aria-label='Tema cobalto' aria-pressed='false'></button>
+          <input id='customColor' type='color' value='#1f4d3a' class='color-input' aria-label='Color personalizado' />
         </div>
-        <button id="importJsonTopBtn" type="button" class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Importar JSON</button>
-        <button id="pdfBtn" type="button" class="rounded-full accent-bg px-5 py-3 text-sm font-black text-white shadow-soft transition hover:opacity-95">Generar PDF pro</button>
+        <button id='importJsonTopBtn' type='button' class='btn btn-secondary btn-header' aria-label='Abrir importación de JSON'>Importar</button>
+        <button id='saveCacheTopBtn' type='button' class='btn btn-secondary btn-header' aria-label='Guardar selección en este equipo'>Guardar</button>
+        <button id='pdfBtn' type='button' class='btn btn-primary btn-header' aria-label='Generar PDF de la cotización'>PDF</button>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-    <section data-od-id="hero" class="mb-8 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
-      <div class="card overflow-hidden p-7 sm:p-9">
-        <div class="mb-5 flex flex-wrap gap-2">
-          <span class="pill">Una página</span>
-          <span class="pill">PDF con librería</span>
-          <span class="pill">Plan por etapas</span>
-          <span class="pill">Alcance por ítem</span>
-        </div>
-        <h1 class="max-w-3xl text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">Cotiza proyectos web con estructura comercial real y un PDF elegante para enviar al cliente.</h1>
-        <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Carga tus datos como proveedor, datos del cliente, ítems con descripción, fechas, entregables por etapa y formas de pago. El PDF final se genera como documento corporativo, no como captura de la web.</p>
+  <main id='main' class='workspace'>
+    <section class='workspace-intro' aria-labelledby='introTitle'>
+      <div class='intro-copy-block'>
+        <p class='eyebrow'>Cotización en una sola vista</p>
+        <h1 id='introTitle' class='intro-title'>Completa, revisa y envía.</h1>
+        <p class='intro-copy'>Datos comerciales, alcance, cronograma y PDF en el mismo lugar. Sin pasos innecesarios y con tus datos guardados solo en este navegador.</p>
       </div>
-      <aside class="card soft-panel p-7 sm:p-9">
-        <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Vista rápida</p>
-        <div class="mt-5 grid grid-cols-2 gap-3">
-          <div class="rounded-2xl border border-slate-200 bg-white p-4">
-            <p class="text-xs font-bold text-slate-500">Ítems</p>
-            <p id="itemCount" class="number mt-1 text-2xl font-black text-slate-950">0</p>
-          </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-4">
-            <p class="text-xs font-bold text-slate-500">Etapas</p>
-            <p id="weekCount" class="number mt-1 text-2xl font-black text-slate-950">0</p>
-          </div>
-          <div class="col-span-2 rounded-2xl border border-slate-200 bg-white p-4">
-            <p class="text-xs font-bold text-slate-500">Total cotizado</p>
-            <p id="heroTotal" class="number mt-1 text-3xl font-black accent-text">S/ 0.00</p>
-          </div>
-        </div>
-        <p id="clientPreview" class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-600">Completa el cliente para personalizar la cotización.</p>
-      </aside>
+      <ol class='intro-steps' aria-label='Secciones de la cotización'>
+        <li><span>01</span> Datos</li>
+        <li><span>02</span> Documento</li>
+        <li><span>03</span> Ítems</li>
+        <li><span>04</span> Proyecto</li>
+        <li><span>05</span> Cronograma</li>
+      </ol>
     </section>
 
-    <div class="grid gap-8 lg:grid-cols-[1fr_390px] lg:items-start">
-      <div class="space-y-8">
-        <section data-od-id="parties" class="card p-7 sm:p-9">
-          <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Datos comerciales</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Proveedor y cliente</h2>
-              <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Completa primero tus datos y luego los del cliente. Esta información se usa en la carátula y encabezado del PDF corporativo.</p>
-            </div>
-            <button type="button" class="clear-section-btn icon-btn danger shrink-0" data-section="commercial" data-tooltip="Limpiar datos comerciales" title="Limpiar datos comerciales" aria-label="Limpiar datos comerciales">×</button>
-          </div>
-          <div class="grid gap-7">
-            <div class="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-6 sm:p-7">
-              <h3 class="mb-6 text-sm font-black text-slate-800">Tus datos como proveedor</h3>
-              <div class="grid gap-x-6 gap-y-6 md:grid-cols-2">
-                <div>
-                  <label class="label" for="providerName">Nombre completo / razón social</label>
-                  <input id="providerName" class="field" placeholder="Ej. Gonzalo Rivera" />
-                </div>
-                <div>
-                  <label class="label" for="providerBrand">Nombre comercial</label>
-                  <input id="providerBrand" class="field" placeholder="Ej. Studio Web Pro" />
-                </div>
-                <div>
-                  <label class="label" for="providerRuc">RUC / documento opcional</label>
-                  <input id="providerRuc" class="field" placeholder="Opcional" />
-                </div>
-                <div>
-                  <label class="label" for="providerEmail">Correo</label>
-                  <input id="providerEmail" type="email" class="field" placeholder="correo@proveedor.com" />
-                </div>
-                <div>
-                  <label class="label" for="providerPhone">Teléfono</label>
-                  <input id="providerPhone" class="field" placeholder="+51 999 999 999" />
-                </div>
-                <div>
-                  <label class="label" for="providerAddress">Dirección / ciudad</label>
-                  <input id="providerAddress" class="field" placeholder="Lima, Perú" />
-                </div>
+    <div class='workspace-grid'>
+      <div class='workspace-main'>
+        <section id='section-commercial' data-od-id='parties' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>01</span>
+              <div>
+                <h2 class='section-title'>Datos comerciales</h2>
+                <p class='section-copy'>Quién cotiza y a quién. Esta información aparece en la carátula del PDF.</p>
               </div>
             </div>
-            <div class="rounded-[1.35rem] border border-slate-200 bg-white p-6 sm:p-7">
-              <h3 class="mb-6 text-sm font-black text-slate-800">Datos del cliente</h3>
-              <div class="grid gap-x-6 gap-y-6 md:grid-cols-2">
-                <div>
-                  <label class="label" for="clientName">Cliente / razón social</label>
-                  <input id="clientName" class="field" placeholder="Ej. Inversiones Andina S.A.C." />
+            <button type='button' class='clear-section-btn icon-btn danger' data-section='commercial' data-tooltip='Limpiar datos comerciales' title='Limpiar datos comerciales' aria-label='Limpiar datos comerciales'>
+              <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+            </button>
+          </header>
+          <div class='section-body'>
+            <div class='party-grid'>
+              <fieldset class='party-panel'>
+                <legend class='panel-title'>Tus datos como proveedor</legend>
+                <div class='field-grid'>
+                  <div>
+                    <label class='label' for='providerName'>Nombre completo / razón social</label>
+                    <input id='providerName' class='field' maxlength='160' placeholder='Ej. Gonzalo Rivera' autocomplete='name' />
+                  </div>
+                  <div>
+                    <label class='label' for='providerBrand'>Nombre comercial</label>
+                    <input id='providerBrand' class='field' maxlength='160' placeholder='Ej. Studio Digital' autocomplete='organization' />
+                  </div>
+                  <div>
+                    <label class='label' for='providerRuc'>RUC / documento opcional</label>
+                    <input id='providerRuc' class='field' maxlength='40' placeholder='Opcional' />
+                  </div>
+                  <div>
+                    <label class='label' for='providerEmail'>Correo</label>
+                    <input id='providerEmail' type='email' class='field' maxlength='160' placeholder='correo@proveedor.com' autocomplete='email' />
+                  </div>
+                  <div>
+                    <label class='label' for='providerPhone'>Teléfono</label>
+                    <input id='providerPhone' type='tel' class='field' maxlength='40' placeholder='+51 999 999 999' autocomplete='tel' />
+                  </div>
+                  <div>
+                    <label class='label' for='providerAddress'>Dirección / ciudad</label>
+                    <input id='providerAddress' class='field' maxlength='200' placeholder='Lima, Perú' autocomplete='address-level2' />
+                  </div>
                 </div>
-                <div>
-                  <label class="label" for="clientRuc">RUC / documento opcional</label>
-                  <input id="clientRuc" class="field" placeholder="Opcional" />
+              </fieldset>
+
+              <fieldset class='party-panel'>
+                <legend class='panel-title'>Datos del cliente</legend>
+                <div class='field-grid'>
+                  <div>
+                    <label class='label' for='clientName'>Cliente / razón social</label>
+                    <input id='clientName' class='field' maxlength='160' placeholder='Ej. Inversiones Andina S.A.C.' autocomplete='organization' />
+                  </div>
+                  <div>
+                    <label class='label' for='clientRuc'>RUC / documento opcional</label>
+                    <input id='clientRuc' class='field' maxlength='40' placeholder='Opcional' />
+                  </div>
+                  <div>
+                    <label class='label' for='contactName'>Contacto</label>
+                    <input id='contactName' class='field' maxlength='160' placeholder='Responsable del proyecto' autocomplete='name' />
+                  </div>
+                  <div>
+                    <label class='label' for='contactEmail'>Correo / teléfono</label>
+                    <input id='contactEmail' class='field' maxlength='160' placeholder='correo@empresa.com · +51...' />
+                  </div>
+                  <div class='span-2'>
+                    <label class='label' for='clientAddress'>Dirección / ciudad opcional</label>
+                    <input id='clientAddress' class='field' maxlength='200' placeholder='Opcional' />
+                  </div>
                 </div>
-                <div>
-                  <label class="label" for="contactName">Contacto</label>
-                  <input id="contactName" class="field" placeholder="Responsable del proyecto" />
-                </div>
-                <div>
-                  <label class="label" for="contactEmail">Correo / teléfono</label>
-                  <input id="contactEmail" class="field" placeholder="correo@empresa.com · +51..." />
-                </div>
-                <div class="md:col-span-2">
-                  <label class="label" for="clientAddress">Dirección / ciudad opcional</label>
-                  <input id="clientAddress" class="field" placeholder="Opcional" />
-                </div>
+              </fieldset>
+            </div>
+          </div>
+        </section>
+        <section id='section-finance' data-od-id='finance' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>02</span>
+              <div>
+                <h2 class='section-title'>Documento y pago</h2>
+                <p class='section-copy'>Título, código, fecha, divisa, impuestos y forma de pago.</p>
+              </div>
+            </div>
+            <div class='section-actions'>
+              <button type='button' class='clear-section-btn icon-btn danger' data-section='finance' data-tooltip='Limpiar configuración' title='Limpiar configuración' aria-label='Limpiar configuración'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+              <button id='resetBtn' type='button' class='icon-btn' data-tooltip='Reiniciar ejemplo' title='Reiniciar ejemplo' aria-label='Reiniciar ejemplo'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M16 10a6 6 0 1 1-1.8-4.2M16 4v4h-4' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+            </div>
+          </header>
+          <div class='section-body'>
+            <div class='document-title-row'>
+              <div class='document-title-field'>
+                <label class='title-label' for='quoteTitle'>Título de la cotización</label>
+                <input id='quoteTitle' class='quote-title-input' maxlength='160' placeholder='Ej. Propuesta de automatización' autocomplete='off' />
+              </div>
+              <div class='title-meta document-title-meta'>
+                <span id='docStatus' class='status-pill'>Borrador</span>
+                <span id='quoteMeta' class='title-meta-text'>Completa los datos para generar el PDF.</span>
+              </div>
+            </div>
+            <div class='field-grid field-grid-4'>
+              <div>
+                <label class='label' for='quoteCode'>Código de cotización</label>
+                <input id='quoteCode' class='field' maxlength='60' value='COT-001' />
+              </div>
+              <div>
+                <label class='label' for='issueDate'>Fecha de emisión</label>
+                <input id='issueDate' type='date' class='field' />
+              </div>
+              <div>
+                <label class='label' for='currency'>Divisa</label>
+                <select id='currency' class='field'>
+                  <option value='PEN'>Soles peruanos (S/)</option>
+                  <option value='USD'>Dólares (US$)</option>
+                  <option value='EUR'>Euros (€)</option>
+                </select>
+              </div>
+              <div>
+                <label class='label' for='validity'>Validez de oferta</label>
+                <input id='validity' class='field' maxlength='80' value='15 días calendario' />
+              </div>
+              <div>
+                <label class='label' for='taxRate'>Impuesto (%)</label>
+                <input id='taxRate' type='number' min='0' max='100' step='0.01' class='field' value='18' />
+                <p class='helper'>Ej. IGV 18% en Perú. Déjalo en 0 si no aplica.</p>
+              </div>
+              <div>
+                <label class='label' for='discountRate'>Descuento (%)</label>
+                <input id='discountRate' type='number' min='0' max='100' step='0.01' class='field' value='0' />
+              </div>
+              <div>
+                <label id='advanceLabel' class='label' for='advanceAmount'>Abono inicial opcional (S/)</label>
+                <input id='advanceAmount' type='number' min='0' step='0.01' class='field' value='0' placeholder='Ej. 1000' />
+              </div>
+              <div>
+                <label class='label' for='paymentMode'>Forma de pago</label>
+                <select id='paymentMode' class='field'>
+                  <option value='upfront'>Pago completo al inicio</option>
+                  <option value='advance_balance' selected>Abono inicial y saldo final</option>
+                  <option value='final'>Pago completo al final</option>
+                  <option value='deliverable'>Pago por entregable</option>
+                  <option value='weekly'>Pago por etapas</option>
+                </select>
+              </div>
+              <div class='span-4'>
+                <p id='paymentHelp' class='helper helper-strong'>El abono inicial se descuenta del total. El resto se paga al final o según el cronograma.</p>
+              </div>
+              <div class='span-4'>
+                <label class='label' for='terms'>Condiciones comerciales</label>
+                <textarea id='terms' class='field' maxlength='5000'>Incluye una ronda de ajustes por entregable, capacitación básica y entrega de accesos. No incluye licencias, infraestructura, servicios de terceros ni contenido final salvo que se especifique en los ítems.</textarea>
               </div>
             </div>
           </div>
         </section>
-
-        <section data-od-id="finance" class="card p-6 sm:p-8">
-          <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Configuración</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Divisa, impuestos y documento</h2>
+        <section id='section-items' data-od-id='items' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>03</span>
+              <div>
+                <h2 class='section-title'>Ítems y alcance</h2>
+                <p class='section-copy'>Qué estás cotizando, cuánto cuesta y qué incluye cada partida.</p>
+              </div>
             </div>
-            <div class="flex gap-2 sm:justify-end">
-              <button type="button" class="clear-section-btn icon-btn danger" data-section="finance" data-tooltip="Limpiar configuración" title="Limpiar configuración" aria-label="Limpiar configuración">×</button>
-              <button id="resetBtn" type="button" class="icon-btn" data-tooltip="Reiniciar ejemplo" title="Reiniciar ejemplo" aria-label="Reiniciar ejemplo">↺</button>
+            <div class='section-actions'>
+              <button id='addItemBtn' type='button' class='btn btn-primary btn-sm' title='Agregar ítem' aria-label='Agregar ítem'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M10 4v12M4 10h12' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>
+                Agregar ítem
+              </button>
+              <button id='duplicateBtn' type='button' class='icon-btn' data-tooltip='Duplicar último ítem' title='Duplicar último ítem' aria-label='Duplicar último ítem'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><rect x='7' y='7' width='9' height='9' rx='2' fill='none' stroke='currentColor' stroke-width='1.6'/><path d='M4 13V5a1 1 0 0 1 1-1h8' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round'/></svg>
+              </button>
+              <button type='button' class='clear-section-btn icon-btn danger' data-section='items' data-tooltip='Limpiar ítems' title='Limpiar ítems' aria-label='Limpiar ítems'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
             </div>
-          </div>
-          <div class="grid gap-5 md:grid-cols-4">
-            <div>
-              <label class="label" for="quoteCode">Código de cotización</label>
-              <input id="quoteCode" class="field" value="COT-WEB-001" />
+          </header>
+          <div class='section-body'>
+            <div class='items-head' aria-hidden='true'>
+              <span>Concepto</span><span>Cant.</span><span>Precio</span><span>Tipo</span><span>Total</span><span>Acciones</span>
             </div>
-            <div>
-              <label class="label" for="issueDate">Fecha de emisión</label>
-              <input id="issueDate" type="date" class="field" />
-            </div>
-            <div>
-              <label class="label" for="currency">Divisa</label>
-              <select id="currency" class="field">
-                <option value="PEN">Soles peruanos (S/)</option>
-                <option value="USD">Dólares (US$)</option>
-                <option value="EUR">Euros (€)</option>
-              </select>
-            </div>
-            <div>
-              <label class="label" for="validity">Validez de oferta</label>
-              <input id="validity" class="field" value="15 días calendario" />
-            </div>
-            <div>
-              <label class="label" for="taxRate">IGV / impuesto (%)</label>
-              <input id="taxRate" type="number" min="0" step="0.01" class="field" value="18" />
-            </div>
-            <div>
-              <label class="label" for="discountRate">Descuento (%)</label>
-              <input id="discountRate" type="number" min="0" step="0.01" class="field" value="0" />
-            </div>
-            <div>
-              <label class="label" for="advanceAmount">Abono inicial opcional (S/)</label>
-              <input id="advanceAmount" type="number" min="0" step="0.01" class="field" value="0" placeholder="Ej. 1000" />
-            </div>
-            <div class="md:col-span-3">
-              <label class="label" for="paymentMode">Forma de pago</label>
-              <select id="paymentMode" class="field">
-                <option value="upfront">Pago completo al inicio</option>
-                <option value="advance_balance" selected>Abono inicial y saldo final</option>
-                <option value="final">Pago completo al final</option>
-                <option value="deliverable">Pago por entregable</option>
-                <option value="weekly">Pago por etapas</option>
-              </select>
-            </div>
-            <div class="md:col-span-4">
-              <label class="label" for="terms">Condiciones comerciales</label>
-              <textarea id="terms" class="field min-h-[86px]">Incluye una ronda de ajustes por entregable, capacitación básica y entrega de accesos. No incluye compra de dominio, hosting, licencias externas ni contenido final salvo que se especifique en los ítems.</textarea>
+            <div id='itemsList' class='items-list'></div>
+            <div id='itemsEmpty' class='empty-state hidden'>
+              <p class='empty-title'>Aún no hay ítems</p>
+              <p class='empty-copy'>Agrega el primero o importa una cotización completa desde un JSON.</p>
+              <div class='empty-actions'>
+                <button type='button' class='btn btn-primary' data-action='add-item'>Agregar ítem</button>
+                <button type='button' class='btn btn-secondary' data-action='open-import'>Importar JSON</button>
+              </div>
             </div>
           </div>
         </section>
-
-        <section id="jsonImportSection" data-od-id="json-import" class="card p-6 sm:p-8">
-          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div class="max-w-2xl">
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Importación rápida</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Importar datos desde JSON generado por IA</h2>
-              <p class="mt-1 text-sm leading-6 text-slate-500">Copia el prompt, pégalo en la IA que uses y luego pega aquí el JSON. El cotizador llenará automáticamente los campos principales, ítems, alcance y cronograma.</p>
+        <section id='section-project' data-od-id='project' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>04</span>
+              <div>
+                <h2 class='section-title'>Proyecto y fechas</h2>
+                <p class='section-copy'>Nombre, tipo de proyecto, inicio, plazo y alcance general.</p>
+              </div>
             </div>
-            <button id="copyPromptBtn" class="text-action-btn self-start md:self-center" type="button">Copiar prompt</button>
+            <button type='button' class='clear-section-btn icon-btn danger' data-section='project' data-tooltip='Limpiar alcance y fechas' title='Limpiar alcance y fechas' aria-label='Limpiar alcance y fechas'>
+              <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+            </button>
+          </header>
+          <div class='section-body'>
+            <div class='field-grid field-grid-4'>
+              <div class='span-2'>
+                <label class='label' for='projectName'>Nombre del proyecto</label>
+                <input id='projectName' class='field' maxlength='160' placeholder='Ej. Automatización de pedidos' />
+              </div>
+              <div class='span-2'>
+                <label class='label' for='projectType'>Tipo de proyecto</label>
+                <input id='projectType' class='field' list='projectTypeOptions' maxlength='120' placeholder='Web, móvil, automatización...' autocomplete='off' />
+                <p class='helper'>Escribe el tipo que necesites o elige una sugerencia.</p>
+              </div>
+              <div>
+                <label class='label' for='startDate'>Fecha de inicio</label>
+                <input id='startDate' type='date' class='field' />
+              </div>
+              <div>
+                <label class='label' for='durationQty'>Plazo</label>
+                <input id='durationQty' type='number' min='1' max='520' step='1' class='field' value='4' />
+              </div>
+              <div>
+                <label class='label' for='durationUnit'>Unidad</label>
+                <select id='durationUnit' class='field'>
+                  <option value='days'>Días</option>
+                  <option value='weeks' selected>Semanas</option>
+                </select>
+              </div>
+              <div>
+                <label class='label' for='endDate'>Fecha final automática</label>
+                <input id='endDate' type='date' class='field field-readonly' readonly />
+              </div>
+              <div class='span-4'>
+                <label class='label' for='scope'>Alcance general del proyecto</label>
+                <textarea id='scope' class='field' maxlength='5000' placeholder='Resume objetivos, entregables, integraciones, pruebas, dependencias y exclusiones principales.'></textarea>
+              </div>
+            </div>
           </div>
-          <div class="grid gap-5 lg:grid-cols-2">
+        </section>
+        <section id='section-schedule' data-od-id='schedule' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>05</span>
+              <div>
+                <h2 class='section-title'>Cronograma y pagos</h2>
+                <p class='section-copy'>Etapas, entregables y abonos. La última etapa coincide con la fecha final.</p>
+              </div>
+            </div>
+            <div class='section-actions'>
+              <button id='addScheduleStageBtn' type='button' class='btn btn-secondary btn-sm' title='Agregar etapa' aria-label='Agregar etapa'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M10 4v12M4 10h12' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>
+                Agregar etapa
+              </button>
+              <button id='distributeScheduleBtn' type='button' class='btn btn-secondary btn-sm' title='Distribuir pagos' aria-label='Distribuir pagos'>Distribuir pagos</button>
+              <button id='syncScheduleBtn' type='button' class='icon-btn' data-tooltip='Sincronizar etapas' title='Sincronizar etapas' aria-label='Sincronizar etapas'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M16 10a6 6 0 1 1-1.8-4.2M16 4v4h-4' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+              <button type='button' class='clear-section-btn icon-btn danger' data-section='schedule' data-tooltip='Limpiar cronograma' title='Limpiar cronograma' aria-label='Limpiar cronograma'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+            </div>
+          </header>
+          <div class='section-body'>
+            <p id='scheduleHelp' class='helper'>El abono inicial va aparte. Si el pago es por entregable o por etapas, reparte el saldo entre las etapas.</p>
+            <p id='scheduleWarning' class='warning-note hidden' role='status'></p>
+            <div class='schedule-head' aria-hidden='true'>
+              <span>Etapa</span><span>Fecha</span><span>Entregable</span><span>Abono</span><span></span>
+            </div>
+            <div id='scheduleList' class='schedule-list'></div>
+            <div id='scheduleEmpty' class='empty-state hidden'>
+              <p class='empty-title'>Sin etapas todavía</p>
+              <p class='empty-copy'>Define el plazo y pulsa Sincronizar para crear las etapas automáticamente.</p>
+              <div class='empty-actions'>
+                <button type='button' class='btn btn-primary' data-action='sync-schedule'>Sincronizar etapas</button>
+                <button type='button' class='btn btn-secondary' data-action='add-stage'>Agregar etapa</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <aside id='summaryPanel' data-od-id='summary' class='summary' aria-label='Resumen de la cotización'>
+        <div class='summary-sheet'>
+          <div class='summary-head'>
             <div>
-              <label class="label" for="aiPromptText">Prompt para pedir el JSON</label>
-              <textarea id="aiPromptText" class="field min-h-[360px] font-mono text-xs leading-5" readonly>Actúa como consultor comercial para proyectos web. Devuélveme SOLO un JSON válido, sin markdown, sin comentarios y sin texto adicional, para importar una cotización en un cotizador web.
+              <p class='eyebrow'>Resumen</p>
+              <h2 id='summaryTitle' class='summary-title'>Cotización de proyecto</h2>
+              <p id='clientPreview' class='summary-client'>Completa el cliente para personalizar la cotización.</p>
+            </div>
+            <div class='summary-stats' aria-live='polite'>
+              <span><strong id='itemCount'>0</strong> ítems</span>
+              <span><strong id='weekCount'>0</strong> etapas</span>
+            </div>
+          </div>
 
-Usa exactamente esta estructura y rellena valores realistas según mi descripción del proyecto. El contenido debe estar escrito para clientes no técnicos: explica el alcance, entregables, exclusiones y condiciones con lenguaje comercial claro, sin jerga innecesaria ni términos demasiado técnicos.
+          <div class='summary-total' aria-live='polite'>
+            <span class='summary-total-label'>Total cotizado</span>
+            <strong id='heroTotal' class='summary-total-value'>S/ 0.00</strong>
+          </div>
 
-Si mi prompt menciona ciudad, país o mercado objetivo, úsalo como referencia para estimar una cotización más precisa. Considera rangos aproximados del mercado local de esa ciudad para servicios web similares, complejidad del proyecto, moneda habitual, impuestos aplicables si se mencionan y nivel profesional esperado. Si no tienes certeza de precios locales, usa una estimación prudente y explícala en los textos de alcance o condiciones sin inventar fuentes, métricas ni promesas falsas.
+          <div class='summary-breakdown' aria-live='polite'>
+            <div class='summary-row'><span>Subtotal</span><strong id='subtotal'>S/ 0.00</strong></div>
+            <div class='summary-row'><span>Descuento</span><strong id='discount'>S/ 0.00</strong></div>
+            <div class='summary-row'><span>Base imponible</span><strong id='taxable'>S/ 0.00</strong></div>
+            <div class='summary-row'><span>Impuesto</span><strong id='tax'>S/ 0.00</strong></div>
+            <div class='summary-row summary-row-total'><span>Total</span><strong id='grandTotal'>S/ 0.00</strong></div>
+          </div>
+
+          <div class='summary-payments'>
+            <div class='summary-payment'><span>Abono inicial</span><strong id='advance'>S/ 0.00</strong></div>
+            <div class='summary-payment'><span>Saldo</span><strong id='balance'>S/ 0.00</strong></div>
+          </div>
+
+          <div class='summary-delivery'>
+            <span class='summary-mini-label'>Entrega estimada</span>
+            <p id='deliveryPreview'>Define fecha de inicio y plazo.</p>
+          </div>
+
+          <div class='summary-checklist'>
+            <p class='eyebrow'>Antes de enviar</p>
+            <ul id='completionList' class='checklist'>
+              <li data-check='client'><a href='#section-commercial'><span class='check-icon' aria-hidden='true'></span><span>Cliente identificado</span></a></li>
+              <li data-check='items'><a href='#section-items'><span class='check-icon' aria-hidden='true'></span><span>Al menos un ítem con precio</span></a></li>
+              <li data-check='dates'><a href='#section-project'><span class='check-icon' aria-hidden='true'></span><span>Inicio y plazo definidos</span></a></li>
+              <li data-check='payment'><a href='#section-schedule'><span class='check-icon' aria-hidden='true'></span><span>Pago y cronograma coherentes</span></a></li>
+            </ul>
+          </div>
+
+          <div class='summary-actions'>
+            <button id='copyBtn' type='button' class='btn btn-secondary btn-full'>Copiar resumen</button>
+            <button id='pdfBtnAside' type='button' class='btn btn-primary btn-full'>Generar PDF</button>
+            <p id='copyNotice' class='notice hidden' role='status'>Resumen copiado.</p>
+            <p id='copyError' class='error-note hidden' role='alert'>No se pudo copiar. Selecciona el texto y copia manualmente.</p>
+            <p id='pdfNotice' class='notice hidden' role='status'>PDF generado correctamente.</p>
+          </div>
+
+          <details class='summary-cache'>
+            <summary>Datos guardados en este equipo</summary>
+            <div class='cache-body'>
+              <div class='cache-head'>
+                <p>Elige qué conservar al recargar.</p>
+                <span id='cacheState' class='status-pill status-pill-soft'>Sin guardar</span>
+              </div>
+              <div class='cache-options'>
+                <label class='check-row'><input id='cacheAll' type='checkbox' checked /> Todo</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='commercial' checked /> Datos comerciales</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='finance' checked /> Documento y pago</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='items' checked /> Ítems</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='project' checked /> Proyecto y fechas</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='schedule' checked /> Cronograma</label>
+              </div>
+              <button id='saveCacheBtn' type='button' class='btn btn-secondary btn-full'>Guardar selección</button>
+              <button id='clearAllCacheBtn' type='button' class='btn btn-danger-ghost btn-full'>Borrar todos los datos</button>
+              <p id='cacheNotice' class='notice hidden' role='status'>Datos guardados.</p>
+            </div>
+          </details>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class='mobile-bar' role='region' aria-label='Acciones rápidas de la cotización'>
+    <div class='mobile-total' aria-live='polite'>
+      <span>Total</span>
+      <strong id='mobileTotal'>S/ 0.00</strong>
+    </div>
+    <div class='mobile-actions'>
+      <button id='mobileSummaryBtn' type='button' class='btn btn-secondary btn-sm'>Resumen</button>
+      <button id='mobilePdfBtn' type='button' class='btn btn-primary btn-sm'>PDF</button>
+    </div>
+  </div>
+  <div id='importDrawer' class='drawer-shell hidden' aria-hidden='true'>
+    <div class='drawer-backdrop' data-close-drawer></div>
+    <section class='drawer' role='dialog' aria-modal='true' aria-labelledby='importDrawerTitle' aria-describedby='importDrawerCopy' tabindex='-1'>
+      <header class='drawer-head'>
+        <div>
+          <p class='eyebrow'>Importación rápida</p>
+          <h2 id='importDrawerTitle'>Importar desde JSON</h2>
+          <p id='importDrawerCopy'>Copia el prompt, pídelo a una IA y pega el JSON. Revisaremos los datos antes de aplicarlos.</p>
+        </div>
+        <button id='closeImportDrawerBtn' type='button' class='icon-btn' aria-label='Cerrar importación' title='Cerrar importación'>
+          <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='m5 5 10 10M15 5 5 15' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>
+        </button>
+      </header>
+      <div class='drawer-tabs' role='tablist' aria-label='Pasos de importación'>
+        <button id='promptTab' class='tab-btn is-active' type='button' role='tab' aria-selected='true' aria-controls='promptPanel'>1. Prompt</button>
+        <button id='jsonTab' class='tab-btn' type='button' role='tab' aria-selected='false' aria-controls='jsonPanel'>2. JSON</button>
+      </div>
+      <div id='promptPanel' class='drawer-panel' role='tabpanel' aria-labelledby='promptTab'>
+        <label class='label' for='aiPromptText'>Prompt para pedir el JSON</label>
+        <textarea id='aiPromptText' class='field prompt-field' readonly>Actúa como consultor comercial para proyectos digitales: desarrollo web, aplicaciones móviles, automatización de procesos, integraciones, software a medida, datos e IA. Devuélveme SOLO un JSON válido, sin markdown, sin comentarios y sin texto adicional, para importar una cotización.
+
+Usa exactamente esta estructura y rellena valores realistas según mi descripción del proyecto. El contenido debe estar escrito para clientes no técnicos: explica el alcance, entregables, exclusiones y condiciones con lenguaje comercial claro, sin jerga innecesaria ni promesas falsas.
+
+Si mi prompt menciona ciudad, país o mercado objetivo, úsalo como referencia para estimar una cotización más precisa. Considera rangos aproximados del mercado local para servicios digitales similares, complejidad del proyecto, moneda habitual, impuestos aplicables si se mencionan y nivel profesional esperado. Si no tienes certeza de precios locales, usa una estimación prudente y explícala en los textos de alcance o condiciones sin inventar fuentes, métricas ni garantías.
 
 {
-  "proveedor": {
-    "nombre": "Nombre completo o razón social del proveedor",
-    "marca": "Nombre comercial opcional",
-    "ruc": "RUC o documento opcional",
-    "correo": "correo@proveedor.com",
-    "telefono": "+51 999 999 999",
-    "direccion": "Ciudad, país"
+  &quot;documento&quot;: {
+    &quot;titulo&quot;: &quot;Título breve de la cotización&quot;,
+    &quot;codigo&quot;: &quot;COT-001&quot;,
+    &quot;fechaEmision&quot;: &quot;YYYY-MM-DD&quot;,
+    &quot;divisa&quot;: &quot;PEN&quot;,
+    &quot;validez&quot;: &quot;15 días calendario&quot;,
+    &quot;impuestoPorcentaje&quot;: 18,
+    &quot;descuentoPorcentaje&quot;: 0,
+    &quot;abonoInicial&quot;: 0,
+    &quot;formaPago&quot;: &quot;advance_balance&quot;,
+    &quot;condiciones&quot;: &quot;Condiciones comerciales claras. No incluir soporte como concepto cotizable.&quot;
   },
-  "cliente": {
-    "nombre": "Nombre o razón social del cliente",
-    "ruc": "RUC o documento opcional",
-    "contacto": "Persona responsable",
-    "correoTelefono": "correo o teléfono",
-    "direccion": "Dirección opcional"
+  &quot;proveedor&quot;: {
+    &quot;nombre&quot;: &quot;Nombre completo o razón social del proveedor&quot;,
+    &quot;marca&quot;: &quot;Nombre comercial opcional&quot;,
+    &quot;ruc&quot;: &quot;RUC o documento opcional&quot;,
+    &quot;correo&quot;: &quot;correo@proveedor.com&quot;,
+    &quot;telefono&quot;: &quot;+51 999 999 999&quot;,
+    &quot;direccion&quot;: &quot;Ciudad, país&quot;
   },
-  "documento": {
-    "codigo": "COT-WEB-001",
-    "fechaEmision": "YYYY-MM-DD",
-    "divisa": "PEN",
-    "validez": "15 días calendario",
-    "impuestoPorcentaje": 18,
-    "descuentoPorcentaje": 0,
-    "abonoInicial": 0,
-    "formaPago": "advance_balance",
-    "condiciones": "Condiciones comerciales claras. No incluir soporte como concepto cotizable."
+  &quot;cliente&quot;: {
+    &quot;nombre&quot;: &quot;Nombre o razón social del cliente&quot;,
+    &quot;ruc&quot;: &quot;RUC o documento opcional&quot;,
+    &quot;contacto&quot;: &quot;Persona responsable&quot;,
+    &quot;correoTelefono&quot;: &quot;correo o teléfono&quot;,
+    &quot;direccion&quot;: &quot;Dirección opcional&quot;
   },
-  "proyecto": {
-    "nombre": "Nombre del proyecto",
-    "tipo": "Landing page | Web corporativa | E-commerce | Sistema web | Dashboard / herramienta interna | Optimización / mejora evolutiva",
-    "fechaInicio": "YYYY-MM-DD",
-    "plazo": 4,
-    "unidadPlazo": "weeks",
-    "alcanceGeneral": "Resumen del alcance, entregables, exclusiones y dependencias."
+  &quot;proyecto&quot;: {
+    &quot;nombre&quot;: &quot;Nombre del proyecto&quot;,
+    &quot;tipo&quot;: &quot;Web, aplicación móvil, automatización, integración, software a medida, datos o consultoría&quot;,
+    &quot;fechaInicio&quot;: &quot;YYYY-MM-DD&quot;,
+    &quot;plazo&quot;: 4,
+    &quot;unidadPlazo&quot;: &quot;weeks&quot;,
+    &quot;alcanceGeneral&quot;: &quot;Resumen del alcance, entregables, exclusiones y dependencias.&quot;
   },
-  "items": [
+  &quot;items&quot;: [
     {
-      "concepto": "Nombre del ítem",
-      "descripcion": "Qué incluye este ítem y sus límites.",
-      "cantidad": 1,
-      "precio": 1200,
-      "tipo": "Estrategia | Diseño | Desarrollo | Integración | Licencia | Contenido"
+      &quot;concepto&quot;: &quot;Nombre del ítem&quot;,
+      &quot;descripcion&quot;: &quot;Qué incluye este ítem y sus límites.&quot;,
+      &quot;cantidad&quot;: 1,
+      &quot;precio&quot;: 1200,
+      &quot;tipo&quot;: &quot;Estrategia | Diseño | Desarrollo | Integración | Automatización | Pruebas | Despliegue | Licencia | Contenido&quot;
     }
   ],
-  "cronograma": [
+  &quot;cronograma&quot;: [
     {
-      "etapa": 1,
-      "fecha": "YYYY-MM-DD",
-      "entregable": "Qué se entregará en esta etapa",
-      "abono": 0
+      &quot;etapa&quot;: 1,
+      &quot;fecha&quot;: &quot;YYYY-MM-DD&quot;,
+      &quot;entregable&quot;: &quot;Qué se entregará en esta etapa&quot;,
+      &quot;abono&quot;: 0
     }
   ]
 }
 
 Valores permitidos y reglas:
 - divisa: PEN, USD o EUR.
-- formaPago: upfront, advance_balance, final, deliverable o weekly. Usa weekly cuando el pago sea por etapas.
+- formaPago: upfront, advance_balance, final, deliverable o weekly.
 - unidadPlazo: days o weeks.
-- abonoInicial siempre debe ser monto fijo, no porcentaje.
+- abonoInicial y abono: montos fijos, nunca porcentajes.
+- cantidad y precio deben ser números mayores o iguales a 0.
+- Las fechas deben usar el formato YYYY-MM-DD.
 - Redacta conceptos, descripciones, alcance general, entregables y condiciones para que un cliente no técnico entienda qué está pagando.
-- Ajusta precios, plazos y cronograma por etapas a la ciudad o mercado indicado por el usuario cuando exista esa información.
-- Si falta información, usa texto breve y honesto, no inventes métricas exageradas, fuentes ni garantías.</textarea>
-            </div>
-            <div>
-              <label class="label" for="jsonInput">JSON para importar</label>
-              <textarea id="jsonInput" class="field min-h-[360px] font-mono text-xs leading-5" placeholder='Pega aquí el JSON generado por la IA. Ejemplo: { "proveedor": { "nombre": "..." }, "items": [...] }'></textarea>
-              <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button id="importJsonBtn" class="rounded-full accent-bg px-5 py-3 text-sm font-black text-white transition hover:opacity-95" type="button">Importar y rellenar cotización</button>
-                <p id="jsonImportNotice" class="hidden text-sm font-bold text-emerald-700">JSON importado correctamente.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section data-od-id="items" class="card overflow-hidden p-6 sm:p-8">
-          <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div class="max-w-2xl">
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Primero define qué se cotiza</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Ítems, precios y alcance opcional</h2>
-              <p class="mt-1 text-sm text-slate-500">Cada ítem puede incluir una descripción de alcance para que el PDF explique qué cubre el precio.</p>
-            </div>
-            <div class="section-actions self-start md:self-center md:shrink-0">
-              <button id="addItemBtn" type="button" class="text-action-btn" title="Agregar ítem" aria-label="Agregar ítem">Agregar ítem</button>
-              <button id="duplicateBtn" type="button" class="icon-btn" data-tooltip="Duplicar último ítem" title="Duplicar último ítem" aria-label="Duplicar último ítem">⧉</button>
-              <button type="button" class="clear-section-btn icon-btn danger" data-section="items" data-tooltip="Limpiar ítems" title="Limpiar ítems" aria-label="Limpiar ítems">×</button>
-            </div>
-          </div>
-          <div class="hidden rounded-xl bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 lg:grid lg:grid-cols-[1.25fr_.55fr_.72fr_.72fr_.82fr_auto] lg:gap-3">
-            <span>Concepto</span><span>Cant.</span><span>Precio</span><span>Tipo</span><span>Total</span><span>Acciones</span>
-          </div>
-          <div id="itemsList" class="mt-4 space-y-4"></div>
-        </section>
-
-        <section data-od-id="project" class="card p-6 sm:p-8">
-          <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Después de los ítems</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Alcance general, fechas y entregables</h2>
-            </div>
-            <button type="button" class="clear-section-btn icon-btn danger shrink-0" data-section="project" data-tooltip="Limpiar alcance y fechas" title="Limpiar alcance y fechas" aria-label="Limpiar alcance y fechas">×</button>
-          </div>
-          <div class="grid gap-5 md:grid-cols-4">
-            <div class="md:col-span-2">
-              <label class="label" for="projectName">Nombre del proyecto</label>
-              <input id="projectName" class="field" placeholder="Ej. Web corporativa + cotizador" />
-            </div>
-            <div class="md:col-span-2">
-              <label class="label" for="projectType">Tipo de proyecto</label>
-              <select id="projectType" class="field">
-                <option>Landing page</option>
-                <option>Web corporativa</option>
-                <option>E-commerce</option>
-                <option>Sistema web</option>
-                <option>Dashboard / herramienta interna</option>
-                <option>Optimización / mejora evolutiva</option>
-              </select>
-            </div>
-            <div>
-              <label class="label" for="startDate">Fecha de inicio</label>
-              <input id="startDate" type="date" class="field" />
-            </div>
-            <div>
-              <label class="label" for="durationQty">Plazo</label>
-              <input id="durationQty" type="number" min="1" step="1" class="field" value="4" />
-            </div>
-            <div>
-              <label class="label" for="durationUnit">Unidad</label>
-              <select id="durationUnit" class="field">
-                <option value="days">Días</option>
-                <option value="weeks" selected>Semanas</option>
-              </select>
-            </div>
-            <div>
-              <label class="label" for="endDate">Fecha final automática</label>
-              <input id="endDate" type="date" class="field bg-slate-50" readonly />
-            </div>
-            <div class="md:col-span-4">
-              <label class="label" for="scope">Alcance general del proyecto</label>
-              <textarea id="scope" class="field min-h-[124px]" placeholder="Resume objetivos, pantallas, integraciones, entregables, capacitación, dependencias y exclusiones principales."></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section data-od-id="schedule" class="card p-6 sm:p-8">
-          <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div class="max-w-2xl">
-              <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Plan de ejecución</p>
-              <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Cronograma por etapas y pagos</h2>
-              <p class="mt-1 text-sm text-slate-500">Organiza la ejecución por etapas. Puedes indicar qué se entregará, la fecha estimada y cuánto se abonará en cada hito.</p>
-            </div>
-            <div class="section-actions self-start md:self-center md:shrink-0">
-              <button id="addScheduleStageBtn" type="button" class="text-action-btn" title="Agregar etapa" aria-label="Agregar etapa">Agregar etapa</button>
-              <button id="distributeScheduleBtn" type="button" class="text-action-btn" title="Distribuir pagos" aria-label="Distribuir pagos">Distribuir pagos</button>
-              <button id="syncScheduleBtn" type="button" class="icon-btn" data-tooltip="Sincronizar etapas" title="Sincronizar etapas" aria-label="Sincronizar etapas">↻</button>
-              <button type="button" class="clear-section-btn icon-btn danger" data-section="schedule" data-tooltip="Limpiar cronograma" title="Limpiar cronograma" aria-label="Limpiar cronograma">×</button>
-            </div>
-          </div>
-          <div id="scheduleHelp" class="mb-4 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm font-semibold text-blue-800">El abono inicial siempre se considera aparte si lo completas. Para pagos por entregable o por etapas, usa el cronograma para definir qué se entrega y cuánto se abona en cada hito.</div>
-          <div class="hidden rounded-xl bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 lg:grid lg:grid-cols-[.6fr_.95fr_1.35fr_.72fr_auto] lg:gap-3">
-            <span>Etapa</span><span>Fecha</span><span>Entregable</span><span>Abono</span><span></span>
-          </div>
-          <div id="scheduleList" class="mt-4 space-y-4"></div>
-        </section>
+- Ajusta precios, plazos y cronograma al mercado indicado por el usuario cuando exista esa información.
+- Si falta información, usa texto breve y honesto; no inventes métricas, fuentes ni garantías.</textarea>
+        <div class='drawer-actions'>
+          <button id='copyPromptBtn' type='button' class='btn btn-secondary'>Copiar prompt</button>
+        </div>
+        <p id='promptNotice' class='notice hidden' role='status'>Prompt copiado.</p>
+        <p id='promptError' class='error-note hidden' role='alert'>No se pudo copiar. Selecciona el texto y copia manualmente.</p>
       </div>
-
-      <aside data-od-id="summary" class="card sticky top-28 p-6 sm:p-7 summary-scroll">
-        <div class="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Resumen</p>
-            <h2 class="mt-1 text-xl font-black tracking-tight text-slate-950">Resultado final</h2>
-          </div>
-          <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Editable</span>
+      <div id='jsonPanel' class='drawer-panel hidden' role='tabpanel' aria-labelledby='jsonTab'>
+        <label class='label' for='jsonInput'>JSON para importar</label>
+        <textarea id='jsonInput' class='field json-field' placeholder='Pega aquí el JSON generado por la IA.'></textarea>
+        <div id='jsonImportError' class='error-box hidden' role='alert'></div>
+        <p id='jsonImportNotice' class='notice hidden' role='status'>JSON importado correctamente.</p>
+        <div class='drawer-actions'>
+          <button id='importJsonBtn' type='button' class='btn btn-primary'>Importar y rellenar</button>
         </div>
-
-        <div class="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Subtotal</span><strong id="subtotal" class="number text-slate-950">S/ 0.00</strong></div>
-          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Descuento</span><strong id="discount" class="number text-slate-950">S/ 0.00</strong></div>
-          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Base imponible</span><strong id="taxable" class="number text-slate-950">S/ 0.00</strong></div>
-          <div class="flex items-center justify-between gap-3 text-sm"><span class="text-slate-500">Impuesto</span><strong id="tax" class="number text-slate-950">S/ 0.00</strong></div>
-          <div class="my-2 h-px bg-slate-200"></div>
-          <div class="flex items-end justify-between gap-3"><span class="text-sm font-bold text-slate-600">Total cotizado</span><strong id="grandTotal" class="number text-3xl font-black accent-text">S/ 0.00</strong></div>
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 gap-3">
-          <div class="rounded-2xl border border-slate-200 bg-white p-4">
-            <p class="text-xs font-bold text-slate-500">Abono inicial</p>
-            <p id="advance" class="number mt-1 text-lg font-black text-slate-950">S/ 0.00</p>
-          </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-4">
-            <p class="text-xs font-bold text-slate-500">Saldo</p>
-            <p id="balance" class="number mt-1 text-lg font-black text-slate-950">S/ 0.00</p>
-          </div>
-        </div>
-
-        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
-          <p class="text-xs font-bold text-slate-500">Entrega estimada</p>
-          <p id="deliveryPreview" class="mt-1 text-sm font-black text-slate-950">Define fecha de inicio y plazo.</p>
-        </div>
-
-        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <div class="mb-3 flex items-start justify-between gap-3">
-            <div>
-              <p class="text-xs font-black uppercase tracking-[.16em] text-slate-400">Datos guardados</p>
-              <p class="mt-1 text-sm font-bold text-slate-700">Elige qué conservar en este equipo.</p>
-            </div>
-            <span id="cacheState" class="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500">Sin guardar</span>
-          </div>
-          <div class="grid gap-2 text-sm font-bold text-slate-600">
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input id="cacheAll" type="checkbox" class="h-4 w-4 accent-[var(--accent)]" checked /> Todo</label>
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="commercial" checked /> Datos comerciales</label>
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="finance" checked /> Divisa e impuestos</label>
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="items" checked /> Ítems</label>
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="project" checked /> Alcance y fechas</label>
-            <label class="flex items-center gap-2 rounded-xl bg-white px-3 py-2"><input class="cache-section h-4 w-4 accent-[var(--accent)]" type="checkbox" value="schedule" checked /> Etapas y pagos</label>
-          </div>
-          <button id="saveCacheBtn" type="button" class="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Guardar selección</button>
-          <p id="cacheNotice" class="mt-3 hidden text-center text-sm font-bold text-emerald-700">Datos guardados.</p>
-        </div>
-
-        <div class="mt-5 space-y-3">
-          <button id="copyBtn" type="button" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-700 transition hover:border-slate-300">Copiar resumen</button>
-          <button id="pdfBtnAside" type="button" class="w-full rounded-2xl accent-bg px-4 py-3 text-sm font-black text-white transition hover:opacity-95">Generar PDF corporativo</button>
-          <p id="copyNotice" class="hidden text-center text-sm font-bold text-emerald-700">Resumen copiado.</p>
-          <p id="pdfNotice" class="hidden rounded-2xl bg-emerald-50 p-3 text-center text-sm font-bold text-emerald-700">PDF generado correctamente.</p>
-        </div>
-      </aside>
-    </div>
-  </main>
-
-  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/20 px-4 backdrop-blur-sm">
-    <div class="w-full max-w-md rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-soft">
-      <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">Confirmar limpieza</p>
-      <h2 id="modalTitle" class="mt-2 text-xl font-black tracking-tight text-slate-950">Limpiar sección</h2>
-      <p id="modalText" class="mt-2 text-sm leading-6 text-slate-500">Se limpiarán los datos visibles y los datos guardados de esta sección.</p>
-      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <button id="cancelClearBtn" type="button" class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700">Cancelar</button>
-        <button id="confirmClearBtn" type="button" class="rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white">Limpiar datos</button>
+      </div>
+    </section>
+  </div>
+  <div id='confirmModal' class='modal-shell hidden' aria-hidden='true'>
+    <div class='modal-backdrop' data-close-modal></div>
+    <div class='modal' role='dialog' aria-modal='true' aria-labelledby='modalTitle' aria-describedby='modalText'>
+      <p class='eyebrow'>Confirmar limpieza</p>
+      <h2 id='modalTitle'>Limpiar sección</h2>
+      <p id='modalText'>Se limpiarán los datos visibles y los datos guardados de esta sección.</p>
+      <div class='modal-actions'>
+        <button id='cancelClearBtn' type='button' class='btn btn-secondary'>Cancelar</button>
+        <button id='confirmClearBtn' type='button' class='btn btn-danger'>Limpiar datos</button>
       </div>
     </div>
   </div>
 
-  <script src="assets/js/core.js"></script>
-  <script src="assets/js/items.js"></script>
-  <script src="assets/js/schedule.js"></script>
-  <script src="assets/js/summary.js"></script>
-  <script src="assets/js/import.js"></script>
-  <script src="assets/js/pdf.js"></script>
-  <script src="assets/js/app.js"></script>
+  <datalist id='projectTypeOptions'>
+    <option value='Landing page'></option>
+    <option value='Web corporativa'></option>
+    <option value='E-commerce'></option>
+    <option value='Sistema web'></option>
+    <option value='Dashboard / herramienta interna'></option>
+    <option value='Aplicación móvil'></option>
+    <option value='App iOS / Android'></option>
+    <option value='Automatización de procesos'></option>
+    <option value='Integración de sistemas / API'></option>
+    <option value='Chatbot / asistente IA'></option>
+    <option value='Software a medida'></option>
+    <option value='Análisis de datos'></option>
+    <option value='Consultoría / auditoría'></option>
+    <option value='Mantenimiento / optimización'></option>
+    <option value='Otro'></option>
+  </datalist>
+
+  <datalist id='itemTypeOptions'>
+    <option value='Estrategia'></option>
+    <option value='Diseño'></option>
+    <option value='Desarrollo'></option>
+    <option value='Integración'></option>
+    <option value='Automatización'></option>
+    <option value='Pruebas'></option>
+    <option value='Despliegue'></option>
+    <option value='Licencia'></option>
+    <option value='Contenido'></option>
+    <option value='Otro'></option>
+  </datalist>
+
+  <script src='assets/js/core.js'></script>
+  <script src='assets/js/items.js'></script>
+  <script src='assets/js/schedule.js'></script>
+  <script src='assets/js/summary.js'></script>
+  <script src='assets/js/import.js'></script>
+  <script src='assets/js/pdf.js'></script>
+  <script src='assets/js/app.js'></script>
 </body>
 </html>

@@ -1,27 +1,31 @@
 # Mapa de rutas y secciones
 
-La aplicación es una sola página (`index.html`). No hay router, rutas URL, historial ni parámetros de consulta. La navegación es por scroll y por el botón “Importar JSON”, que desplaza a una sección.
+La aplicación es una sola página (`index.html`). No hay router, rutas URL, historial ni parámetros de consulta. La navegación es por scroll, por la barra móvil y por los enlaces del checklist del resumen.
 
 ## Secciones de la página
 
 | Orden | Sección | Identificador | Ubicación | Contenido |
 |---|---|---|---|---|
-| 1 | Cabecera | `header` | `index.html (header)` | Marca, tema de color, importar JSON, generar PDF |
-| 2 | Hero / vista rápida | `data-od-id="hero"` | `index.html (data-od-id="hero")` | Presentación, contador de ítems/etapas, total |
-| 3 | Datos comerciales | `data-od-id="parties"` | `index.html (data-od-id="parties")` | Proveedor y cliente |
-| 4 | Configuración | `data-od-id="finance"` | `index.html (data-od-id="finance")` | Divisa, impuestos, abono, forma de pago |
-| 5 | Importación JSON | `jsonImportSection`, `data-od-id="json-import"` | `index.html (data-od-id="json-import")` | Prompt e importación |
-| 6 | Ítems | `data-od-id="items"` | `index.html (data-od-id="items")` | Lista dinámica de ítems |
-| 7 | Proyecto y fechas | `data-od-id="project"` | `index.html (data-od-id="project")` | Nombre, tipo, inicio, plazo, alcance |
-| 8 | Cronograma | `data-od-id="schedule"` | `index.html (data-od-id="schedule")` | Etapas, entregables y abonos |
-| 9 | Resumen | `data-od-id="summary"` | `index.html (data-od-id="summary")` | Totales, entrega, caché, copiar, PDF |
-| 10 | Modal de confirmación | `confirmModal` | `index.html (#confirmModal)` | Diálogo de limpieza de sección |
+| 1 | Cabecera | `header.topbar` | `index.html` | Marca, color, Importar, Guardar y PDF |
+| 2 | Introducción | `.workspace-intro` | `index.html` | Resumen de uso y pasos 01–05 |
+| 3 | Datos comerciales | `#section-commercial` / `data-od-id="parties"` | `index.html` | Proveedor y cliente |
+| 4 | Documento y pago | `#section-finance` / `data-od-id="finance"` | `index.html` | Título, estado, código, fecha, divisa, impuesto, abono, pago y condiciones |
+| 5 | Ítems | `#section-items` / `data-od-id="items"` | `index.html` | Lista dinámica de ítems y estado vacío |
+| 6 | Proyecto y fechas | `#section-project` / `data-od-id="project"` | `index.html` | Nombre, tipo, inicio, plazo, fin y alcance |
+| 7 | Cronograma | `#section-schedule` / `data-od-id="schedule"` | `index.html` | Etapas, entregables, abonos y avisos |
+| 8 | Resumen | `#summaryPanel` / `data-od-id="summary"` | `index.html` | Totales, pagos, entrega, checklist, caché, copiar y PDF |
+| 9 | Barra móvil | `.mobile-bar` | `index.html` | Total, Resumen y PDF en pantallas ≤767 px |
+| 10 | Panel de importación | `#importDrawer` | `index.html` | Diálogo lateral con pestañas Prompt y JSON |
+| 11 | Modal de confirmación | `#confirmModal` | `index.html` | Confirmación de limpieza de sección o de todos los datos |
 
 ## Anclas y desplazamiento
 
-- No hay enlaces `href="#..."` internos.
-- `importJsonTopBtn` usa `window.scrollTo` hacia `jsonImportSection.offsetTop - 96` (`assets/js/app.js:47 (listener importJsonTopBtn)`).
+- El título de la cotización y su estado se editan en `#section-finance`, no en la cabecera.
+- El checklist del resumen enlaza a `#section-commercial`, `#section-items`, `#section-project` y `#section-schedule`.
+- `scroll-padding-top` mantiene las secciones visibles bajo la cabecera sticky (90 px en escritorio, 158 px en móvil).
+- `#mobileSummaryBtn` desplaza y enfoca `#summaryPanel` en móvil.
 - El resto de la navegación es scroll manual.
+- Los diálogos bloquean el scroll del body mientras están abiertos.
 
 ## Estados de URL
 
@@ -30,5 +34,6 @@ La aplicación es una sola página (`index.html`). No hay router, rutas URL, his
 
 ## Dependencias de red
 
-- Tailwind CDN, jsPDF y jsPDF-AutoTable se cargan al abrir la página (`index.html:7-9`).
+- Tailwind CDN, jsPDF y jsPDF-AutoTable se cargan al abrir la página.
+- Google Fonts carga Calistoga, Inter y JetBrains Mono con fallback local.
 - No hay otras peticiones de red.
