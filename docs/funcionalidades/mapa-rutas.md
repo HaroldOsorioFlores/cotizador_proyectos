@@ -7,17 +7,18 @@ La aplicación es una sola página (`index.html`). No hay router, rutas URL, his
 | Orden | Sección | Identificador | Ubicación | Contenido |
 |---|---|---|---|---|
 | 1 | Cabecera | `header.topbar` | `index.html` | Marca, color, Importar, Guardar y PDF |
-| 2 | Introducción | `.workspace-intro` | `index.html` | Resumen de uso y pasos 01–06 |
+| 2 | Introducción | `.workspace-intro` | `index.html` | Resumen de uso y pasos 01–07 |
 | 3 | Datos comerciales | `#section-commercial` / `data-od-id="parties"` | `index.html` | Proveedor y cliente |
 | 4 | Documento y pago | `#section-finance` / `data-od-id="finance"` | `index.html` | Título, estado, código, fecha, divisa, impuesto, abono, pago y condiciones |
 | 5 | Ítems | `#section-items` / `data-od-id="items"` | `index.html` | Lista dinámica de ítems y estado vacío |
 | 6 | Proyecto y fechas | `#section-project` / `data-od-id="project"` | `index.html` | Nombre, tipo, inicio, plazo, fin y alcance |
 | 7 | Cronograma | `#section-schedule` / `data-od-id="schedule"` | `index.html` | Etapas, entregables, abonos y avisos |
 | 8 | Costos del proveedor | `#section-costs` / `data-od-id="costs"` | `index.html` | Costos internos, prorrateo y margen estimado |
-| 9 | Resumen | `#summaryPanel` / `data-od-id="summary"` | `index.html` | Totales, pagos, margen, entrega, checklist, caché, copiar y PDF |
-| 10 | Barra móvil | `.mobile-bar` | `index.html` | Total, Resumen y PDF en pantallas ≤767 px |
-| 11 | Panel de importación | `#importDrawer` | `index.html` | Diálogo lateral con pestañas Prompt y JSON |
-| 12 | Modal de confirmación | `#confirmModal` | `index.html` | Confirmación de limpieza de sección o de todos los datos |
+| 9 | Costos de terceros | `#section-third-party` / `data-od-id="third-party"` | `index.html` | Pagos a Apple/Google y otros proveedores, con total referencial |
+| 10 | Resumen | `#summaryPanel` / `data-od-id="summary"` | `index.html` | Totales, pagos, margen, costos de terceros, entrega, checklist, caché, copiar y PDF |
+| 11 | Barra móvil | `.mobile-bar` | `index.html` | Total, Resumen y PDF en pantallas ≤767 px |
+| 12 | Panel de importación | `#importDrawer` | `index.html` | Diálogo lateral con pestañas Prompt y JSON |
+| 13 | Modal de confirmación | `#confirmModal` | `index.html` | Confirmación de limpieza de sección o de todos los datos |
 
 ## Anclas y desplazamiento
 
