@@ -109,7 +109,7 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 - Ubicación: `generatePdf()` (`assets/js/pdf.js`); botones `pdfBtn`, `pdfBtnAside` y `mobilePdfBtn`.
 - Contenido:
   - Página 1: título editable, código, fecha, validez, total, proyecto/entrega, cliente/proveedor y alcance/condiciones.
-  - Página 2: ítems, costos de terceros si existen, resumen financiero, cronograma y condiciones si aplica.
+  - Página 2: ítems, resumen financiero, costos de terceros si existen, cronograma y condiciones si aplica.
 - Costos de terceros: tabla aparte con concepto, periodicidad y total referencial; nota de que los paga el cliente y no forman parte del total de servicios.
 - Tipografía: Times para títulos y Helvetica para cuerpo; acento del tema.
 - Metadatos: título, proyecto, autor/proveedor y creador.
@@ -177,7 +177,7 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 - Ubicación: `#section-third-party`; render en `renderThirdPartyCosts()` (`assets/js/costs.js`).
 - Campos por costo: concepto, monto y periodicidad (`one_time`, `annual`, `monthly`).
 - Regla: el total de terceros es la suma de los montos; se muestra como “Total referencial” porque las periodicidades pueden variar y los montos dependen de cada proveedor. No se prorratea ni se suma al total de servicios.
-- El cliente los paga directamente al proveedor. El PDF incluye una tabla aparte con concepto, periodicidad y total referencial, más una nota de que no forman parte del total de servicios. La sección se omite si no hay filas.
+- El cliente los paga directamente al proveedor. El PDF incluye una tabla aparte, después del resumen financiero, con concepto, periodicidad y total referencial, más una nota de que no forman parte del total de servicios. La sección se omite si no hay filas.
 - Acciones: agregar, editar, eliminar y limpiar la sección; estado vacío con acción para agregar.
 - Persistencia: sección `thirdPartyCosts` de la misma clave; se guarda y restaura con la selección.
 - Importación: acepta `costosTerceros`/`thirdPartyCosts` con `concepto`, `monto` y `periodicidad`; valida monto no negativo y periodicidad permitida. El prompt de IA indica que Apple/Google y licencias externas van aquí, no en `items`.

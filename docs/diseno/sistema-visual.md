@@ -82,9 +82,9 @@ Estudio editorial: papel cálido, tinta oscura, acento verde bosque configurable
 ## PDF
 
 - Página 1: encabezado con título, código/fecha/validez, total, proveedor/cliente, proyecto y resumen ejecutivo.
-- Página 2: ítems, costos de terceros si existen, resumen financiero, cronograma y condiciones.
+- Página 2: ítems, resumen financiero, costos de terceros si existen, cronograma y condiciones.
 - Los costos internos del proveedor y el margen no se imprimen en el PDF.
-- Los costos de terceros se imprimen en una tabla aparte, con su propio total referencial y una nota; no se suman al total de servicios.
+- Los costos de terceros se imprimen después del resumen financiero, en una tabla aparte con su propio total referencial y una nota; no se suman al total de servicios.
 - Times para títulos y Helvetica para cuerpo (fuentes nativas de jsPDF).
 - Acento del tema en barra superior, total, títulos de sección, cabecera de ítems, cabecera del cronograma y fila de total; fondo blanco para impresión. No se usan beiges fijos que rompan la elección de color.
 - Pie: “Cotizador Pro · Página X de Y”.
