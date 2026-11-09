@@ -58,7 +58,7 @@ Estudio editorial: papel cálido, tinta oscura, acento verde bosque configurable
 - Cabecera sticky compacta: marca a la izquierda y acciones a la derecha; el título y el estado viven en Documento y pago.
 - Workspace máximo 1280 px, padding 16/24/32 px.
 - Grid `1fr 380px` desde 1024 px; resumen sticky; una columna por debajo.
-- Secciones numeradas `01`–`05` con borde superior y acciones a la derecha.
+- Secciones numeradas `01`–`06` con borde superior y acciones a la derecha.
 - Barra inferior fija en móvil con total y acciones PDF/resumen.
 - Drawer de importación a la derecha (480 px; ancho completo en móvil).
 - Modal de confirmación centrado de 480 px.
@@ -74,7 +74,7 @@ Estudio editorial: papel cálido, tinta oscura, acento verde bosque configurable
 - **Button ghost:** transparente, hover `--accent-soft`.
 - **Icon button:** 44×44 px, borde 1 px, `aria-label` obligatorio, tooltip visual.
 - **Pill:** solo para estados (Borrador, Guardado, Pendiente).
-- **Summary sheet:** hoja blanca con barra superior de acento, total en display, desglose mono, CTA PDF.
+- **Summary sheet:** hoja blanca con barra superior de acento, total en display, desglose mono, bloque de margen interno (costos estimados y margen) y CTA PDF.
 - **Checklist:** cuatro pasos con icono SVG, estado pendiente/completo y enlace a la sección.
 - **Empty state:** borde discontinuo, texto muted y CTA.
 - **Drawer/modal:** overlay `rgba(23,23,23,.28)`, foco atrapado, Escape, retorno de foco.
@@ -83,6 +83,7 @@ Estudio editorial: papel cálido, tinta oscura, acento verde bosque configurable
 
 - Página 1: encabezado con título, código/fecha/validez, total, proveedor/cliente, proyecto y resumen ejecutivo.
 - Página 2: ítems, resumen financiero, cronograma y condiciones.
+- Los costos internos del proveedor y el margen no se imprimen en el PDF.
 - Times para títulos y Helvetica para cuerpo (fuentes nativas de jsPDF).
 - Acento del tema en barra superior, total, títulos de sección, cabecera de ítems, cabecera del cronograma y fila de total; fondo blanco para impresión. No se usan beiges fijos que rompan la elección de color.
 - Pie: “Cotizador Pro · Página X de Y”.

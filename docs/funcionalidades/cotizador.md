@@ -2,7 +2,7 @@
 
 Ubicación: `index.html` + `assets/css/styles.css` + `assets/js/*.js`.
 Actor: profesional que cotiza proyectos digitales para un cliente.
-Estado: implementado y verificado con Playwright MCP el 2026-11-07.
+Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 
 ## F-01 Datos comerciales
 
@@ -75,27 +75,28 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-07.
 - Objetivo: cargar una cotización completa desde JSON generado por IA.
 - Ubicación: panel lateral `#importDrawer`; lógica en `assets/js/import.js`.
 - Entrada: pestaña Prompt con `aiPromptText` y botón Copiar; pestaña JSON con `jsonInput` y botón Importar.
-- Estructura esperada: `documento` (con `titulo`), `proveedor`, `cliente`, `proyecto`, `items`, `cronograma`; acepta alias en inglés.
+- Estructura esperada: `documento` (con `titulo`), `proveedor`, `cliente`, `proyecto`, `items`, `costos`, `cronograma`; acepta alias en inglés.
 - Validaciones:
-  - Raíz y subobjetos de tipo objeto; listas para ítems y cronograma.
-  - Cada ítem y etapa debe ser objeto.
+  - Raíz y subobjetos de tipo objeto; listas para ítems, costos y cronograma.
+  - Cada ítem, costo y etapa debe ser objeto.
   - Números finitos y dentro de rangos; no se aceptan negativos.
   - Fechas `YYYY-MM-DD` reales.
   - Divisa, forma de pago y unidad de plazo dentro del catálogo.
+  - Periodicidad de costos: `monthly`, `annual` o `one_time` (acepta alias en español).
   - Tipo de proyecto libre, no vacío y con límite de longitud.
   - Límites de longitud para textos.
 - Si hay errores: se muestra una lista, el foco va al bloque de error y no se muta el formulario.
 - La fecha del cronograma se valida y se escapa antes de renderizar.
 - Portapapeles: helper con `navigator.clipboard`, fallback `execCommand` y aviso de error controlado.
-- Prueba manual: JSON válido de app móvil, `items:[null]`, negativos, fecha inválida, divisa inválida y payload XSS.
+- Prueba manual: JSON válido de app móvil, `items:[null]`, negativos, costos con monto negativo o periodicidad inválida, fecha inválida, divisa inválida y payload XSS.
 
 ## F-07 Persistencia local
 
 - Objetivo: conservar datos entre recargas.
 - Clave: `cotizador-web-pro-cache-v1` (`assets/js/core.js`).
-- Secciones: `commercial`, `finance`, `items`, `project`, `schedule`.
+- Secciones: `commercial`, `finance`, `items`, `project`, `schedule`, `costs`.
 - Guardado: botón Guardar de la cabecera o Guardar selección del resumen; guarda solo las secciones marcadas y el acento.
-- Restauración: `loadSavedCache()` aplica campos, título, ítems, cronograma y color.
+- Restauración: `loadSavedCache()` aplica campos, título, ítems, cronograma, costos y color.
 - Borrado: cada sección tiene confirmación; `Borrar todos los datos` elimina la clave y reinicia el formulario.
 - El checkbox Todo se sincroniza al marcar, desmarcar o limpiar secciones.
 - Privacidad: contiene nombres, RUC, correo, teléfono y dirección; no se envía a ningún servidor.
@@ -149,3 +150,20 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-07.
 - Las cabeceras de sección se apilan hasta 1279 px para dar espacio a las acciones; el formulario usa 2 columnas en tablet y 4 solo desde 1280 px.
 - Foco visible, objetivos de 44 px, labels asociados, `aria-live` en totales y avisos, `prefers-reduced-motion`.
 - Prueba manual: recorrido solo con teclado y resize en los cuatro anchos.
+
+## F-13 Costos del proveedor y margen
+
+- Objetivo: registrar gastos internos (suscripciones, servidores, licencias) y estimar el margen del proyecto sin exponerlos al cliente.
+- Ubicación: `#section-costs`; render en `renderCosts()` (`assets/js/costs.js`).
+- Campos por costo: concepto, monto y periodicidad (`monthly`, `annual`, `one_time`).
+- Reglas de cálculo (`assets/js/core.js:costRowTotal`, `costTotals`):
+  - Meses del proyecto = plazo en días o semanas × 7, dividido entre 30; mínimo 1 mes.
+  - Mensual = monto × meses; anual = monto × meses / 12; único = monto.
+  - Costos estimados = Σ de los costos prorrateados.
+  - Margen estimado = base imponible − costos estimados.
+  - Margen % = margen / base imponible × 100.
+- El margen se muestra solo en el resumen (`#costTotal`, `#marginTotal`, `#marginPercent`) y se marca en rojo si es negativo. No se incluye en el PDF ni en el resumen copiado.
+- Acciones: agregar, editar, eliminar y limpiar la sección; estado vacío con acción para agregar.
+- Persistencia: sección `costs` de la misma clave; se guarda y restaura con la selección.
+- Importación: acepta `costos`/`costs` con `concepto`, `monto` y `periodicidad`; valida monto no negativo y periodicidad permitida (acepta alias en español).
+- Prueba manual: agregar costos mensual, anual y único; cambiar el plazo y la divisa; guardar, recargar, limpiar e importar.

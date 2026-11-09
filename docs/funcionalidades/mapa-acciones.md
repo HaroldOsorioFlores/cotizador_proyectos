@@ -72,6 +72,17 @@ Toda acción visible de `index.html`, su handler y su efecto. No hay navegación
 | Editar etapa | `.schedule-date`, `.schedule-deliverable`, `.schedule-amount` | listeners de etapa | Actualizan estado; la fecha manual se conserva y el abono recalcula |
 | Eliminar etapa | `.remove-schedule` | listener de etapa | Elimina y renumera |
 
+## Costos del proveedor
+
+| Control | Ubicación | Handler | Efecto |
+|---|---|---|---|
+| Agregar costo | `#addCostBtn` y `[data-action="add-cost"]` | `addCost` (`assets/js/costs.js`) | Añade un costo interno, enfoca el concepto y recalcula el margen |
+| Limpiar costos | `.clear-section-btn[data-section="costs"]` | `openClearModal('costs')` | Vacía los costos y su caché; muestra estado vacío |
+| Editar costo | `.cost-name`, `.cost-amount`, `.cost-period` | listeners de costo | Actualizan `state.costs`; el monto y la periodicidad recalculan el prorrateo y el margen |
+| Eliminar costo | `.remove-cost` | listener de costo | Elimina la fila y recalcula |
+
+- Los costos no se incluyen en el PDF ni en el texto de Copiar resumen; solo alimentan `#costTotal`, `#marginTotal` y `#marginPercent` del resumen.
+
 ## Resumen, caché y PDF
 
 | Control | Ubicación | Handler | Efecto |
@@ -94,6 +105,6 @@ Toda acción visible de `index.html`, su handler y su efecto. No hay navegación
 | Fondo del modal | `[data-close-modal]` | `closeDialog` | Cierra la confirmación |
 | Fondo del drawer | `[data-close-drawer]` | `closeDialog` | Cierra la importación |
 
-- Cualquier `input`, `textarea` o `select` dispara `calculate`; el título además actualiza la pestaña y el resumen.
+- Los campos estáticos disparan `calculate`; los ítems, costos y etapas actualizan su estado y recalculan totales o margen cuando corresponde.
 - Los diálogos atrapan el foco, cierran con Escape y devuelven el foco al disparador.
 - No hay `fetch`, `XMLHttpRequest`, telemetría ni analítica.
