@@ -241,6 +241,34 @@ function importJsonData() {
     }
   }
 
+  let normalizedThirdPartyCosts = null;
+  if (data.costosTerceros !== undefined || data.thirdPartyCosts !== undefined) {
+    const rawThirdPartyCosts = pick(data, ['costosTerceros', 'thirdPartyCosts']);
+    if (!Array.isArray(rawThirdPartyCosts)) {
+      errors.push('Los costos de terceros deben ser una lista.');
+    } else {
+      normalizedThirdPartyCosts = rawThirdPartyCosts.map((cost, index) => {
+        const label = `El costo de terceros ${index + 1}`;
+        if (!isPlainObject(cost)) {
+          errors.push(`${label} debe ser un objeto.`);
+          return null;
+        }
+        const name = asText(pick(cost, ['concepto', 'name']), `${label}: concepto`, errors, 200);
+        const amount = asNumber(pick(cost, ['monto', 'amount']), `${label}: monto`, errors, { min: 0, max: 100000000, fallback: 0 });
+        const rawPeriod = pick(cost, ['periodicidad', 'period']);
+        const period = costPeriodValue(rawPeriod);
+        if (rawPeriod !== undefined && !period) {
+          errors.push(`${label}: periodicidad debe ser monthly, annual o one_time.`);
+        }
+        return {
+          name: name || '',
+          amount: amount ?? 0,
+          period: period || 'one_time'
+        };
+      }).filter(Boolean);
+    }
+  }
+
   let normalizedSchedule = null;
   if (data.cronograma !== undefined || data.schedule !== undefined) {
     const rawSchedule = pick(data, ['cronograma', 'schedule']);
@@ -284,6 +312,10 @@ function importJsonData() {
   if (normalizedCosts !== null) {
     state.costs = normalizedCosts;
     renderCosts();
+  }
+  if (normalizedThirdPartyCosts !== null) {
+    state.thirdPartyCosts = normalizedThirdPartyCosts;
+    renderThirdPartyCosts();
   }
   if (normalizedSchedule !== null) {
     state.schedule = normalizedSchedule;
@@ -388,6 +420,8 @@ function copySummary() {
     `Abono inicial: ${money(advance)}`,
     `Saldo: ${money(balance)}`,
     `Forma de pago: ${paymentModeText()}`
-  ].join('\n');
-  copyText(lines, els.copyNotice, els.copyError, 'Resumen copiado.');
+  ];
+  const thirdParty = thirdPartyTotal();
+  if (thirdParty > 0) lines.push(`Costos de terceros (no incluidos): ${money(thirdParty)}`);
+  copyText(lines.join('\n'), els.copyNotice, els.copyError, 'Resumen copiado.');
 }

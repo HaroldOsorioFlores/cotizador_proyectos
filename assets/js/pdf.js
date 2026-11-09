@@ -247,6 +247,46 @@ function generatePdf() {
   });
   y = (doc.lastAutoTable?.finalY || y) + 8;
 
+  if (state.thirdPartyCosts.length) {
+    if (y > pageHeight - 70) {
+      doc.addPage();
+      paintPage();
+      y = 20;
+    }
+    y = drawSectionTitle('Costos de terceros (no incluidos en el total)', y);
+    doc.autoTable({
+      startY: y,
+      theme: 'grid',
+      margin: { left: margin, right: margin, top: 20, bottom: 18 },
+      tableWidth,
+      styles: { font: 'helvetica', fontSize: 8, cellPadding: 2, lineColor: line, lineWidth: 0.2, textColor: ink, valign: 'top', overflow: 'linebreak' },
+      headStyles: { fillColor: accent, textColor: white, fontStyle: 'bold', fontSize: 8 },
+      head: [['Concepto', 'Periodicidad', 'Total']],
+      body: state.thirdPartyCosts.map(cost => [
+        cleanText(cost.name),
+        thirdPartyPeriodLabel(cost.period),
+        pdfMoney(thirdPartyRowTotal(cost))
+      ]),
+      foot: [['Total referencial', '', pdfMoney(thirdPartyTotal())]],
+      footStyles: { fillColor: [247, 244, 238], textColor: ink, fontStyle: 'bold' },
+      columnStyles: {
+        0: { cellWidth: 120 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 32, halign: 'right' }
+      }
+    });
+    y = (doc.lastAutoTable?.finalY || y) + 3;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(muted[0], muted[1], muted[2]);
+    const thirdPartyNote = doc.splitTextToSize('Estos montos los paga el cliente directamente a cada proveedor y pueden variar según la cuenta, el país y las políticas vigentes. No forman parte del total de servicios.', tableWidth);
+    thirdPartyNote.forEach(line => {
+      doc.text(line, margin, y);
+      y += 3.6;
+    });
+    y += 5;
+  }
+
   if (y > pageHeight - 55) {
     doc.addPage();
     paintPage();
@@ -280,6 +320,14 @@ function generatePdf() {
     }
   });
   y = (doc.lastAutoTable?.finalY || y) + 8;
+
+  if (state.thirdPartyCosts.length) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(muted[0], muted[1], muted[2]);
+    doc.text('El total de servicios no incluye los costos de terceros.', 70, y);
+    y += 5;
+  }
 
   if (state.schedule.length) {
     if (y > pageHeight - 55) {
