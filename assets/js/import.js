@@ -213,6 +213,34 @@ function importJsonData() {
     }
   }
 
+  let normalizedCosts = null;
+  if (data.costos !== undefined || data.costs !== undefined) {
+    const rawCosts = pick(data, ['costos', 'costs']);
+    if (!Array.isArray(rawCosts)) {
+      errors.push('Los costos deben ser una lista.');
+    } else {
+      normalizedCosts = rawCosts.map((cost, index) => {
+        const label = `El costo ${index + 1}`;
+        if (!isPlainObject(cost)) {
+          errors.push(`${label} debe ser un objeto.`);
+          return null;
+        }
+        const name = asText(pick(cost, ['concepto', 'name']), `${label}: concepto`, errors, 200);
+        const amount = asNumber(pick(cost, ['monto', 'amount']), `${label}: monto`, errors, { min: 0, max: 100000000, fallback: 0 });
+        const rawPeriod = pick(cost, ['periodicidad', 'period']);
+        const period = costPeriodValue(rawPeriod);
+        if (rawPeriod !== undefined && !period) {
+          errors.push(`${label}: periodicidad debe ser monthly, annual o one_time.`);
+        }
+        return {
+          name: name || '',
+          amount: amount ?? 0,
+          period: period || 'monthly'
+        };
+      }).filter(Boolean);
+    }
+  }
+
   let normalizedSchedule = null;
   if (data.cronograma !== undefined || data.schedule !== undefined) {
     const rawSchedule = pick(data, ['cronograma', 'schedule']);
@@ -252,6 +280,10 @@ function importJsonData() {
   if (normalizedItems !== null) {
     state.items = normalizedItems;
     renderItems();
+  }
+  if (normalizedCosts !== null) {
+    state.costs = normalizedCosts;
+    renderCosts();
   }
   if (normalizedSchedule !== null) {
     state.schedule = normalizedSchedule;

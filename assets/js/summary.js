@@ -97,6 +97,26 @@ function calculate() {
     const item = state.items[index];
     if (item) element.textContent = money(Number(item.qty || 0) * Number(item.price || 0));
   });
+  const costValues = costTotals();
+  if (els.costTotal) els.costTotal.textContent = money(costValues.total);
+  const margin = totalValues.taxable - costValues.total;
+  if (els.marginTotal) {
+    els.marginTotal.textContent = money(margin);
+    els.marginTotal.classList.toggle('is-negative', margin < 0);
+  }
+  if (els.marginPercent) {
+    els.marginPercent.textContent = totalValues.taxable > 0 ? `${Math.round((margin / totalValues.taxable) * 100)}%` : '—';
+    els.marginPercent.classList.toggle('is-negative', margin < 0);
+  }
+  if (els.costsHelp) {
+    els.costsHelp.textContent = state.costs.length
+      ? `Los costos mensuales y anuales se prorratean por ${costValues.months} ${costValues.months === 1 ? 'mes' : 'meses'} de proyecto. No aparecen en el PDF.`
+      : 'Agrega suscripciones, servidores o licencias. Los montos mensuales y anuales se prorratean según el plazo y no aparecen en el PDF.';
+  }
+  document.querySelectorAll('.cost-total').forEach((element, index) => {
+    const cost = state.costs[index];
+    if (cost) element.textContent = money(costRowTotal(cost, costValues.months));
+  });
   els.clientPreview.textContent = els.clientName.value
     ? `${els.clientName.value}${els.clientRuc.value ? ' · RUC ' + els.clientRuc.value : ''}`
     : 'Completa el cliente para personalizar la cotización.';
