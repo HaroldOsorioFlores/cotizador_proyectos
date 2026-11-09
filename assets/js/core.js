@@ -9,7 +9,8 @@ function defaultItems() {
 
 const state = {
   items: defaultItems(),
-  schedule: []
+  schedule: [],
+  costs: []
 };
 
 const els = {};
@@ -23,7 +24,8 @@ const sectionLabels = {
   finance: 'Documento y pago',
   items: 'Ítems cotizados',
   project: 'Proyecto y fechas',
-  schedule: 'Cronograma y pagos'
+  schedule: 'Cronograma y pagos',
+  costs: 'Costos del proveedor'
 };
 
 const clearLabels = { ...sectionLabels, all: 'todos los datos' };
@@ -72,6 +74,14 @@ function cloneItems() {
   }));
 }
 
+function cloneCosts() {
+  return state.costs.map(cost => ({
+    name: cost.name || '',
+    amount: Number(cost.amount || 0),
+    period: costPeriodValue(cost.period) || 'monthly'
+  }));
+}
+
 function cloneSchedule() {
   return state.schedule.map((row, index) => ({
     week: Number(row.week || index + 1),
@@ -93,6 +103,14 @@ function normalizeScheduleRow(row = {}, index = 0) {
     deliverable: row.deliverable || row.entregable || '',
     amount: Number(row.amount ?? row.abono ?? 0),
     manualDate: Boolean(row.manualDate || date)
+  };
+}
+
+function normalizeCostRow(row = {}) {
+  return {
+    name: String(row.name || row.concepto || ''),
+    amount: Number(row.amount ?? row.monto ?? 0),
+    period: costPeriodValue(row.period || row.periodicidad) || 'monthly'
   };
 }
 
@@ -139,6 +157,7 @@ function saveSelectedCache() {
     if (sectionFields[section]) cache[section] = valuesFor(sectionFields[section]);
     if (section === 'items') cache.items = cloneItems();
     if (section === 'schedule') cache.schedule = cloneSchedule();
+    if (section === 'costs') cache.costs = cloneCosts();
   });
   writeCache(cache);
   showNotice(els.cacheNotice, 'Datos guardados.');
@@ -162,6 +181,9 @@ function loadSavedCache() {
   if (Array.isArray(cache.schedule)) {
     state.schedule = cache.schedule.map(normalizeScheduleRow);
     restoredSchedule = true;
+  }
+  if (Array.isArray(cache.costs)) {
+    state.costs = cache.costs.map(normalizeCostRow);
   }
   updateCacheState();
   updateQuoteTitle();
@@ -197,6 +219,10 @@ function resetSection(section) {
     state.schedule = [];
     renderSchedule();
   }
+  if (section === 'costs') {
+    state.costs = [];
+    renderCosts();
+  }
   calculate();
 }
 
@@ -217,8 +243,10 @@ function resetAllData() {
   els.endDate.value = '';
   state.items = [];
   state.schedule = [];
+  state.costs = [];
   renderItems();
   renderSchedule();
+  renderCosts();
   updateQuoteTitle();
   updateAdvanceLabel();
   updateDeliveryPreview();
@@ -427,4 +455,45 @@ function totals() {
   const total = taxable + tax;
   const advance = Math.min(total, Math.max(0, Number(els.advanceAmount.value || 0)));
   return { subtotal, discount, taxable, tax, total, advance, balance: total - advance };
+}
+
+function projectMonths() {
+  const qty = Math.max(1, Number(els.durationQty?.value || 1));
+  const days = els.durationUnit?.value === 'days' ? qty : qty * 7;
+  // shortcut: mes de 30 días y mínimo 1 mes para no subestimar suscripciones.
+  return Math.max(1, Math.round((days / 30) * 100) / 100);
+}
+
+function costPeriodValue(value) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  const aliases = {
+    monthly: 'monthly',
+    mensual: 'monthly',
+    mes: 'monthly',
+    meses: 'monthly',
+    annual: 'annual',
+    anual: 'annual',
+    year: 'annual',
+    yearly: 'annual',
+    ano: 'annual',
+    'año': 'annual',
+    one_time: 'one_time',
+    'one-time': 'one_time',
+    unico: 'one_time',
+    'único': 'one_time'
+  };
+  return aliases[normalized] || '';
+}
+
+function costRowTotal(cost, months = projectMonths()) {
+  const amount = Math.max(0, Number(cost?.amount || 0));
+  if (cost?.period === 'annual') return amount * (months / 12);
+  if (cost?.period === 'monthly') return amount * months;
+  return amount;
+}
+
+function costTotals() {
+  const months = projectMonths();
+  const total = state.costs.reduce((sum, cost) => sum + costRowTotal(cost, months), 0);
+  return { total, months };
 }

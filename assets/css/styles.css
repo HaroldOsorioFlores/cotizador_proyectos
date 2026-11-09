@@ -611,6 +611,18 @@ a {
   flex-wrap: wrap;
 }
 
+#section-costs .section-actions {
+  flex-wrap: nowrap;
+}
+
+#section-costs .section-actions > * {
+  flex: none;
+}
+
+#section-costs .section-actions .btn {
+  white-space: nowrap;
+}
+
 #section-schedule .section-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -788,7 +800,8 @@ textarea.field {
   gap: 6px;
 }
 
-.item-total {
+.item-total,
+.cost-total {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -809,6 +822,26 @@ textarea.field {
 
 .item-type {
   font-size: 12px;
+}
+
+/* Costs */
+
+.costs-head {
+  display: none;
+}
+
+.cost-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+}
+
+.cost-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
 }
 
 /* Schedule */
@@ -1054,6 +1087,25 @@ textarea.field {
   margin-top: 2px;
   font-family: var(--font-mono);
   font-size: 13px;
+}
+
+.summary-margin {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 22px 0;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fbf8f2;
+}
+
+.summary-margin .summary-mini-label {
+  margin: 0 0 2px;
+}
+
+.summary-row strong.is-negative {
+  color: var(--danger);
 }
 
 .summary-delivery {
@@ -1422,7 +1474,8 @@ body.dialog-open {
 
 @media (min-width: 1280px) {
   .items-head,
-  .schedule-head {
+  .schedule-head,
+  .costs-head {
     display: grid;
     gap: 8px;
     padding: 0 12px 8px;
@@ -1441,6 +1494,10 @@ body.dialog-open {
     grid-template-columns: 52px 130px minmax(0, 1fr) 120px 100px;
   }
 
+  .costs-head {
+    grid-template-columns: minmax(0, 1fr) 120px 150px 130px 48px;
+  }
+
   .item-row {
     grid-template-columns: minmax(0, 1.5fr) 56px 88px 112px 104px 144px;
     gap: 8px;
@@ -1448,6 +1505,11 @@ body.dialog-open {
 
   .schedule-row {
     grid-template-columns: 52px 130px minmax(0, 1fr) 120px 100px;
+  }
+
+  .cost-row {
+    grid-template-columns: minmax(0, 1fr) 120px 150px 130px 48px;
+    gap: 8px;
   }
 
   .row-label {
@@ -1465,12 +1527,14 @@ body.dialog-open {
 
 @media (max-width: 1279px) {
   .item-row,
-  .schedule-row {
+  .schedule-row,
+  .cost-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .item-row .span-mobile,
-  .schedule-row .span-mobile {
+  .schedule-row .span-mobile,
+  .cost-row .span-mobile {
     grid-column: 1 / -1;
   }
 
@@ -1658,7 +1722,8 @@ body.dialog-open {
   }
 
   .item-row,
-  .schedule-row {
+  .schedule-row,
+  .cost-row {
     grid-template-columns: minmax(0, 1fr);
   }
 

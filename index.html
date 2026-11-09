@@ -55,6 +55,7 @@
         <li><span>03</span> Ítems</li>
         <li><span>04</span> Proyecto</li>
         <li><span>05</span> Cronograma</li>
+        <li><span>06</span> Costos</li>
       </ol>
     </section>
 
@@ -343,6 +344,40 @@
             </div>
           </div>
         </section>
+        <section id='section-costs' data-od-id='costs' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>06</span>
+              <div>
+                <h2 class='section-title'>Costos del proveedor</h2>
+                <p class='section-copy'>Suscripciones, servidores y licencias que pagas tú. Solo alimentan tu margen interno y no aparecen en el PDF.</p>
+              </div>
+            </div>
+            <div class='section-actions'>
+              <button id='addCostBtn' type='button' class='btn btn-secondary btn-sm' title='Agregar costo' aria-label='Agregar costo'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M10 4v12M4 10h12' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>
+                Agregar costo
+              </button>
+              <button type='button' class='clear-section-btn icon-btn danger' data-section='costs' data-tooltip='Limpiar costos' title='Limpiar costos' aria-label='Limpiar costos'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+            </div>
+          </header>
+          <div class='section-body'>
+            <p id='costsHelp' class='helper'>Agrega suscripciones, servidores o licencias. Los montos mensuales y anuales se prorratean según el plazo del proyecto.</p>
+            <div class='costs-head' aria-hidden='true'>
+              <span>Concepto</span><span>Monto</span><span>Periodicidad</span><span>Total estimado</span><span>Acciones</span>
+            </div>
+            <div id='costsList' class='items-list'></div>
+            <div id='costsEmpty' class='empty-state hidden'>
+              <p class='empty-title'>Sin costos registrados</p>
+              <p class='empty-copy'>Agrega tus suscripciones, servidores o licencias para ver el margen estimado. Esta información es interna.</p>
+              <div class='empty-actions'>
+                <button type='button' class='btn btn-secondary' data-action='add-cost'>Agregar costo</button>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
       <aside id='summaryPanel' data-od-id='summary' class='summary' aria-label='Resumen de la cotización'>
         <div class='summary-sheet'>
@@ -374,6 +409,13 @@
           <div class='summary-payments'>
             <div class='summary-payment'><span>Abono inicial</span><strong id='advance'>S/ 0.00</strong></div>
             <div class='summary-payment'><span>Saldo</span><strong id='balance'>S/ 0.00</strong></div>
+          </div>
+
+          <div class='summary-margin' aria-live='polite'>
+            <p class='summary-mini-label'>Margen interno · no se envía</p>
+            <div class='summary-row'><span>Costos estimados</span><strong id='costTotal'>S/ 0.00</strong></div>
+            <div class='summary-row'><span>Margen estimado</span><strong id='marginTotal'>S/ 0.00</strong></div>
+            <div class='summary-row'><span>Margen %</span><strong id='marginPercent'>—</strong></div>
           </div>
 
           <div class='summary-delivery'>
@@ -413,6 +455,7 @@
                 <label class='check-row'><input class='cache-section' type='checkbox' value='items' checked /> Ítems</label>
                 <label class='check-row'><input class='cache-section' type='checkbox' value='project' checked /> Proyecto y fechas</label>
                 <label class='check-row'><input class='cache-section' type='checkbox' value='schedule' checked /> Cronograma</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='costs' checked /> Costos</label>
               </div>
               <button id='saveCacheBtn' type='button' class='btn btn-secondary btn-full'>Guardar selección</button>
               <button id='clearAllCacheBtn' type='button' class='btn btn-danger-ghost btn-full'>Borrar todos los datos</button>
@@ -504,6 +547,13 @@ Si mi prompt menciona ciudad, país o mercado objetivo, úsalo como referencia p
       &quot;tipo&quot;: &quot;Estrategia | Diseño | Desarrollo | Integración | Automatización | Pruebas | Despliegue | Licencia | Contenido&quot;
     }
   ],
+  &quot;costos&quot;: [
+    {
+      &quot;concepto&quot;: &quot;Suscripción, servidor o licencia que pagará el proveedor&quot;,
+      &quot;monto&quot;: 50,
+      &quot;periodicidad&quot;: &quot;monthly&quot;
+    }
+  ],
   &quot;cronograma&quot;: [
     {
       &quot;etapa&quot;: 1,
@@ -518,8 +568,10 @@ Valores permitidos y reglas:
 - divisa: PEN, USD o EUR.
 - formaPago: upfront, advance_balance, final, deliverable o weekly.
 - unidadPlazo: days o weeks.
+- periodicidad: monthly, annual o one_time.
 - abonoInicial y abono: montos fijos, nunca porcentajes.
 - cantidad y precio deben ser números mayores o iguales a 0.
+- costos: gastos internos del proveedor (suscripciones, servidores, licencias). No son precios cobrados al cliente y no se muestran en el PDF; si no aplica, deja la lista vacía.
 - Las fechas deben usar el formato YYYY-MM-DD.
 - Redacta conceptos, descripciones, alcance general, entregables y condiciones para que un cliente no técnico entienda qué está pagando.
 - Ajusta precios, plazos y cronograma al mercado indicado por el usuario cuando exista esa información.
@@ -587,6 +639,7 @@ Valores permitidos y reglas:
 
   <script src='assets/js/core.js'></script>
   <script src='assets/js/items.js'></script>
+  <script src='assets/js/costs.js'></script>
   <script src='assets/js/schedule.js'></script>
   <script src='assets/js/summary.js'></script>
   <script src='assets/js/import.js'></script>
