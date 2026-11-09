@@ -38,12 +38,13 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 
 ## F-03 Ítems
 
-- Objetivo: desglosar el alcance y los precios.
+- Objetivo: desglosar el alcance y los precios de los servicios que presta el desarrollador.
 - Ubicación: `#section-items`; render en `renderItems()` (`assets/js/items.js`).
 - Campos por ítem: concepto, cantidad, precio, tipo libre con sugerencias y descripción/alcance.
 - Tipos sugeridos: Estrategia, Diseño, Desarrollo, Integración, Automatización, Pruebas, Despliegue, Licencia, Contenido, Otro.
 - Acciones: agregar, duplicar último, mover arriba/abajo, eliminar.
-- Reglas: total por ítem = cantidad × precio; el estado vive en `state.items`.
+- Reglas: total por ítem = cantidad × precio; el estado vive en `state.items`. Los servicios recurrentes del desarrollador (hosting gestionado, mantenimiento, automatización) se expresan como cantidad de meses × precio mensual y se aclara “mensual” en el concepto o la descripción.
+- Los pagos obligatorios a proveedores externos (Apple App Store, Google Play, licencias de terceros) no van en esta tabla; se registran en F-14.
 - Estado vacío: mensaje con acciones para agregar o importar.
 - Prueba manual: agregar, editar, mover, duplicar y eliminar; comprobar recálculo, estado vacío y PDF.
 
@@ -75,28 +76,28 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 - Objetivo: cargar una cotización completa desde JSON generado por IA.
 - Ubicación: panel lateral `#importDrawer`; lógica en `assets/js/import.js`.
 - Entrada: pestaña Prompt con `aiPromptText` y botón Copiar; pestaña JSON con `jsonInput` y botón Importar.
-- Estructura esperada: `documento` (con `titulo`), `proveedor`, `cliente`, `proyecto`, `items`, `costos`, `cronograma`; acepta alias en inglés.
+- Estructura esperada: `documento` (con `titulo`), `proveedor`, `cliente`, `proyecto`, `items`, `costos`, `costosTerceros`, `cronograma`; acepta alias en inglés.
 - Validaciones:
-  - Raíz y subobjetos de tipo objeto; listas para ítems, costos y cronograma.
-  - Cada ítem, costo y etapa debe ser objeto.
+  - Raíz y subobjetos de tipo objeto; listas para ítems, costos, costos de terceros y cronograma.
+  - Cada ítem, costo, costo de terceros y etapa debe ser objeto.
   - Números finitos y dentro de rangos; no se aceptan negativos.
   - Fechas `YYYY-MM-DD` reales.
   - Divisa, forma de pago y unidad de plazo dentro del catálogo.
-  - Periodicidad de costos: `monthly`, `annual` o `one_time` (acepta alias en español).
+  - Periodicidad de costos y costos de terceros: `monthly`, `annual` o `one_time` (acepta alias en español).
   - Tipo de proyecto libre, no vacío y con límite de longitud.
   - Límites de longitud para textos.
 - Si hay errores: se muestra una lista, el foco va al bloque de error y no se muta el formulario.
 - La fecha del cronograma se valida y se escapa antes de renderizar.
 - Portapapeles: helper con `navigator.clipboard`, fallback `execCommand` y aviso de error controlado.
-- Prueba manual: JSON válido de app móvil, `items:[null]`, negativos, costos con monto negativo o periodicidad inválida, fecha inválida, divisa inválida y payload XSS.
+- Prueba manual: JSON válido de app móvil, `items:[null]`, negativos, costos con monto negativo o periodicidad inválida, costos de terceros inválidos, fecha inválida, divisa inválida y payload XSS.
 
 ## F-07 Persistencia local
 
 - Objetivo: conservar datos entre recargas.
 - Clave: `cotizador-web-pro-cache-v1` (`assets/js/core.js`).
-- Secciones: `commercial`, `finance`, `items`, `project`, `schedule`, `costs`.
+- Secciones: `commercial`, `finance`, `items`, `project`, `schedule`, `costs`, `thirdPartyCosts`.
 - Guardado: botón Guardar de la cabecera o Guardar selección del resumen; guarda solo las secciones marcadas y el acento.
-- Restauración: `loadSavedCache()` aplica campos, título, ítems, cronograma, costos y color.
+- Restauración: `loadSavedCache()` aplica campos, título, ítems, cronograma, costos, costos de terceros y color.
 - Borrado: cada sección tiene confirmación; `Borrar todos los datos` elimina la clave y reinicia el formulario.
 - El checkbox Todo se sincroniza al marcar, desmarcar o limpiar secciones.
 - Privacidad: contiene nombres, RUC, correo, teléfono y dirección; no se envía a ningún servidor.
@@ -108,7 +109,8 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 - Ubicación: `generatePdf()` (`assets/js/pdf.js`); botones `pdfBtn`, `pdfBtnAside` y `mobilePdfBtn`.
 - Contenido:
   - Página 1: título editable, código, fecha, validez, total, proyecto/entrega, cliente/proveedor y alcance/condiciones.
-  - Página 2: ítems, resumen financiero, cronograma y condiciones si aplica.
+  - Página 2: ítems, costos de terceros si existen, resumen financiero, cronograma y condiciones si aplica.
+- Costos de terceros: tabla aparte con concepto, periodicidad y total referencial; nota de que los paga el cliente y no forman parte del total de servicios.
 - Tipografía: Times para títulos y Helvetica para cuerpo; acento del tema.
 - Metadatos: título, proyecto, autor/proveedor y creador.
 - Nombre de archivo: código saneado o nombre del proyecto/título como respaldo.
@@ -120,7 +122,7 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
 
 - Objetivo: compartir un resumen textual.
 - Ubicación: `copySummary()` (`assets/js/import.js`); botón `copyBtn`.
-- Contenido: título, código, proveedor, cliente, proyecto, entrega, subtotal, descuento, impuesto, total, abono, saldo y forma de pago.
+- Contenido: título, código, proveedor, cliente, proyecto, entrega, subtotal, descuento, impuesto, total, abono, saldo y forma de pago; si hay costos de terceros, añade una línea con su total referencial y la aclaración de que no están incluidos.
 - Error: si el portapapeles no está disponible y el fallback falla, muestra `#copyError` sin excepción.
 - Prueba manual: copiar en contexto seguro y simular portapapeles bloqueado.
 
@@ -163,7 +165,20 @@ Estado: implementado y verificado con Playwright MCP el 2026-11-08.
   - Margen estimado = base imponible − costos estimados.
   - Margen % = margen / base imponible × 100.
 - El margen se muestra solo en el resumen (`#costTotal`, `#marginTotal`, `#marginPercent`) y se marca en rojo si es negativo. No se incluye en el PDF ni en el resumen copiado.
+- Los pagos a proveedores externos no van aquí: se registran en F-14 y sí aparecen en el PDF.
 - Acciones: agregar, editar, eliminar y limpiar la sección; estado vacío con acción para agregar.
 - Persistencia: sección `costs` de la misma clave; se guarda y restaura con la selección.
 - Importación: acepta `costos`/`costs` con `concepto`, `monto` y `periodicidad`; valida monto no negativo y periodicidad permitida (acepta alias en español).
 - Prueba manual: agregar costos mensual, anual y único; cambiar el plazo y la divisa; guardar, recargar, limpiar e importar.
+
+## F-14 Costos de terceros
+
+- Objetivo: registrar pagos obligatorios a proveedores externos (Apple App Store, Google Play, licencias de terceros, trámites) y mostrarlos al cliente en una sección aparte, con su propio total.
+- Ubicación: `#section-third-party`; render en `renderThirdPartyCosts()` (`assets/js/costs.js`).
+- Campos por costo: concepto, monto y periodicidad (`one_time`, `annual`, `monthly`).
+- Regla: el total de terceros es la suma de los montos; se muestra como “Total referencial” porque las periodicidades pueden variar y los montos dependen de cada proveedor. No se prorratea ni se suma al total de servicios.
+- El cliente los paga directamente al proveedor. El PDF incluye una tabla aparte con concepto, periodicidad y total referencial, más una nota de que no forman parte del total de servicios. La sección se omite si no hay filas.
+- Acciones: agregar, editar, eliminar y limpiar la sección; estado vacío con acción para agregar.
+- Persistencia: sección `thirdPartyCosts` de la misma clave; se guarda y restaura con la selección.
+- Importación: acepta `costosTerceros`/`thirdPartyCosts` con `concepto`, `monto` y `periodicidad`; valida monto no negativo y periodicidad permitida. El prompt de IA indica que Apple/Google y licencias externas van aquí, no en `items`.
+- Prueba manual: agregar Apple/Google, generar el PDF y comprobar que aparecen aparte con su total; guardar, recargar, limpiar e importar.

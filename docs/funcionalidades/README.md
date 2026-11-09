@@ -23,6 +23,7 @@ Fuente funcional de verdad del proyecto. Describe el comportamiento real de `ind
 - Aplicación de una sola página, sin backend ni autenticación.
 - Cotizaciones para proyectos web, móviles, automatización, software a medida, datos y consultoría.
 - Título de cotización editable.
+- Costos internos para margen y costos de terceros separados del total de servicios.
 - Datos persistidos solo en el navegador (`localStorage`, clave `cotizador-web-pro-cache-v1`).
 - Generación de PDF local con jsPDF + AutoTable.
 - Importación JSON validada antes de aplicar cambios.

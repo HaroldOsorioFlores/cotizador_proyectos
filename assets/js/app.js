@@ -25,10 +25,11 @@ function init() {
     'quoteCode', 'issueDate', 'currency', 'validity', 'taxRate', 'discountRate', 'advanceAmount', 'paymentMode', 'terms',
     'advanceLabel', 'paymentHelp', 'addItemBtn', 'duplicateBtn', 'itemsList', 'itemsEmpty',
     'addCostBtn', 'costsHelp', 'costsList', 'costsEmpty',
+    'addThirdPartyBtn', 'thirdPartyHelp', 'thirdPartyList', 'thirdPartyEmpty', 'thirdPartyTotalInline',
     'projectName', 'projectType', 'startDate', 'durationQty', 'durationUnit', 'endDate', 'scope',
     'addScheduleStageBtn', 'distributeScheduleBtn', 'syncScheduleBtn', 'scheduleWarning', 'scheduleList', 'scheduleEmpty',
     'summaryPanel', 'summaryTitle', 'itemCount', 'weekCount', 'clientPreview', 'heroTotal', 'subtotal', 'discount',
-    'taxable', 'tax', 'grandTotal', 'advance', 'balance', 'costTotal', 'marginTotal', 'marginPercent', 'deliveryPreview', 'completionList',
+    'taxable', 'tax', 'grandTotal', 'advance', 'balance', 'costTotal', 'marginTotal', 'marginPercent', 'thirdPartyTotal', 'deliveryPreview', 'completionList',
     'copyBtn', 'pdfBtnAside', 'copyNotice', 'copyError', 'pdfNotice', 'cacheState', 'cacheAll', 'saveCacheBtn',
     'clearAllCacheBtn', 'cacheNotice', 'mobileTotal', 'mobileSummaryBtn', 'mobilePdfBtn',
     'importDrawer', 'closeImportDrawerBtn', 'promptTab', 'jsonTab', 'promptPanel', 'jsonPanel', 'aiPromptText',
@@ -72,6 +73,7 @@ function init() {
     addItem({ ...last });
   });
   els.addCostBtn.addEventListener('click', () => addCost());
+  els.addThirdPartyBtn.addEventListener('click', () => addThirdPartyCost());
   document.getElementById('copyBtn').addEventListener('click', copySummary);
   document.getElementById('addScheduleStageBtn').addEventListener('click', addScheduleStage);
   document.getElementById('syncScheduleBtn').addEventListener('click', () => syncSchedule(true));
@@ -116,6 +118,7 @@ function init() {
       const action = event.currentTarget.dataset.action;
       if (action === 'add-item') addItem();
       if (action === 'add-cost') addCost();
+      if (action === 'add-third-party') addThirdPartyCost();
       if (action === 'open-import') openImportDrawer(event.currentTarget);
       if (action === 'sync-schedule') syncSchedule(true);
       if (action === 'add-stage') addScheduleStage();
@@ -126,6 +129,7 @@ function init() {
   const restoredSchedule = loadSavedCache();
   renderItems();
   renderCosts();
+  renderThirdPartyCosts();
   renderSchedule();
   if (restoredSchedule) {
     updateDeliveryPreview();

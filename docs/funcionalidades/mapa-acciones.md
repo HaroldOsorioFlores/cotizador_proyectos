@@ -83,6 +83,18 @@ Toda acción visible de `index.html`, su handler y su efecto. No hay navegación
 
 - Los costos no se incluyen en el PDF ni en el texto de Copiar resumen; solo alimentan `#costTotal`, `#marginTotal` y `#marginPercent` del resumen.
 
+## Costos de terceros
+
+| Control | Ubicación | Handler | Efecto |
+|---|---|---|---|
+| Agregar costo de terceros | `#addThirdPartyBtn` y `[data-action="add-third-party"]` | `addThirdPartyCost` (`assets/js/costs.js`) | Añade una fila, enfoca el concepto y recalcula el total referencial |
+| Limpiar costos de terceros | `.clear-section-btn[data-section="thirdPartyCosts"]` | `openClearModal('thirdPartyCosts')` | Vacía la sección y su caché; muestra estado vacío |
+| Editar costo de terceros | `.third-party-name`, `.third-party-amount`, `.third-party-period` | listeners de terceros | Actualizan `state.thirdPartyCosts` y el total referencial |
+| Eliminar costo de terceros | `.remove-third-party` | listener de terceros | Elimina la fila y recalcula |
+
+- El total de terceros se muestra en `#thirdPartyTotalInline` y en el resumen (`#thirdPartyTotal`); no se suma al total de servicios.
+- En el PDF se renderiza una tabla aparte con su propio total y una nota de que lo paga el cliente.
+
 ## Resumen, caché y PDF
 
 | Control | Ubicación | Handler | Efecto |

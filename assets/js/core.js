@@ -10,7 +10,8 @@ function defaultItems() {
 const state = {
   items: defaultItems(),
   schedule: [],
-  costs: []
+  costs: [],
+  thirdPartyCosts: []
 };
 
 const els = {};
@@ -25,7 +26,8 @@ const sectionLabels = {
   items: 'Ítems cotizados',
   project: 'Proyecto y fechas',
   schedule: 'Cronograma y pagos',
-  costs: 'Costos del proveedor'
+  costs: 'Costos del proveedor',
+  thirdPartyCosts: 'Costos de terceros'
 };
 
 const clearLabels = { ...sectionLabels, all: 'todos los datos' };
@@ -82,6 +84,14 @@ function cloneCosts() {
   }));
 }
 
+function cloneThirdPartyCosts() {
+  return state.thirdPartyCosts.map(cost => ({
+    name: cost.name || '',
+    amount: Number(cost.amount || 0),
+    period: costPeriodValue(cost.period) || 'one_time'
+  }));
+}
+
 function cloneSchedule() {
   return state.schedule.map((row, index) => ({
     week: Number(row.week || index + 1),
@@ -111,6 +121,14 @@ function normalizeCostRow(row = {}) {
     name: String(row.name || row.concepto || ''),
     amount: Number(row.amount ?? row.monto ?? 0),
     period: costPeriodValue(row.period || row.periodicidad) || 'monthly'
+  };
+}
+
+function normalizeThirdPartyCost(row = {}) {
+  return {
+    name: String(row.name || row.concepto || ''),
+    amount: Number(row.amount ?? row.monto ?? 0),
+    period: costPeriodValue(row.period || row.periodicidad) || 'one_time'
   };
 }
 
@@ -158,6 +176,7 @@ function saveSelectedCache() {
     if (section === 'items') cache.items = cloneItems();
     if (section === 'schedule') cache.schedule = cloneSchedule();
     if (section === 'costs') cache.costs = cloneCosts();
+    if (section === 'thirdPartyCosts') cache.thirdPartyCosts = cloneThirdPartyCosts();
   });
   writeCache(cache);
   showNotice(els.cacheNotice, 'Datos guardados.');
@@ -184,6 +203,9 @@ function loadSavedCache() {
   }
   if (Array.isArray(cache.costs)) {
     state.costs = cache.costs.map(normalizeCostRow);
+  }
+  if (Array.isArray(cache.thirdPartyCosts)) {
+    state.thirdPartyCosts = cache.thirdPartyCosts.map(normalizeThirdPartyCost);
   }
   updateCacheState();
   updateQuoteTitle();
@@ -223,6 +245,10 @@ function resetSection(section) {
     state.costs = [];
     renderCosts();
   }
+  if (section === 'thirdPartyCosts') {
+    state.thirdPartyCosts = [];
+    renderThirdPartyCosts();
+  }
   calculate();
 }
 
@@ -244,9 +270,11 @@ function resetAllData() {
   state.items = [];
   state.schedule = [];
   state.costs = [];
+  state.thirdPartyCosts = [];
   renderItems();
   renderSchedule();
   renderCosts();
+  renderThirdPartyCosts();
   updateQuoteTitle();
   updateAdvanceLabel();
   updateDeliveryPreview();
@@ -496,4 +524,16 @@ function costTotals() {
   const months = projectMonths();
   const total = state.costs.reduce((sum, cost) => sum + costRowTotal(cost, months), 0);
   return { total, months };
+}
+
+function thirdPartyPeriodLabel(period) {
+  return { one_time: 'Único', annual: 'Anual', monthly: 'Mensual' }[period] || 'Único';
+}
+
+function thirdPartyRowTotal(cost) {
+  return Math.max(0, Number(cost?.amount || 0));
+}
+
+function thirdPartyTotal() {
+  return state.thirdPartyCosts.reduce((sum, cost) => sum + thirdPartyRowTotal(cost), 0);
 }

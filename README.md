@@ -6,7 +6,7 @@ Aplicación web estática de una sola página para crear cotizaciones de proyect
 
 1. Abrir `index.html` en un navegador moderno (Chrome, Edge o Firefox).
 2. Escribir el título de la cotización en Documento y pago.
-3. Completar proveedor, cliente, documento, ítems, proyecto, cronograma y costos internos.
+3. Completar proveedor, cliente, documento, ítems, proyecto, cronograma, costos internos y costos de terceros.
 4. Generar el PDF o copiar el resumen.
 
 También puede servirse desde cualquier hosting estático (GitHub Pages, Netlify, servidor local). La generación de PDF y la persistencia son locales al navegador.
@@ -21,6 +21,7 @@ También puede servirse desde cualquier hosting estático (GitHub Pages, Netlify
 - Ítems con concepto, descripción, cantidad, precio, tipo y total.
 - Cronograma por etapas con fechas alineadas al plazo, entregables y abonos; sincronización y distribución de pagos.
 - Costos internos del proveedor (suscripciones, servidores, licencias) con prorrateo según el plazo y margen estimado; no se incluyen en el PDF.
+- Costos de terceros (Apple App Store, Google Play, licencias externas) en una sección aparte con su propio total referencial; se muestran en el PDF sin sumarse a los servicios.
 - Importación desde JSON generado por IA en un panel lateral con pestañas Prompt/JSON.
 - Validación completa del JSON importado y mensajes de error sin mutar el formulario.
 - Persistencia selectiva en `localStorage` (clave `cotizador-web-pro-cache-v1`) y borrado total.
@@ -36,7 +37,7 @@ assets/favicon.svg          Icono local
 assets/js/tailwind-config.js Configuración de Tailwind CDN
 assets/js/core.js           Estado, caché, diálogos, fechas y cálculos base
 assets/js/items.js          Render y acciones de ítems
-assets/js/costs.js          Render y acciones de costos del proveedor
+assets/js/costs.js          Render y acciones de costos internos y de terceros
 assets/js/schedule.js       Cronograma, fechas y distribución
 assets/js/summary.js        Cálculo, pagos y checklist
 assets/js/import.js         Drawer de importación, validación y portapapeles

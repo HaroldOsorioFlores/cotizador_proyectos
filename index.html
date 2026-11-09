@@ -56,6 +56,7 @@
         <li><span>04</span> Proyecto</li>
         <li><span>05</span> Cronograma</li>
         <li><span>06</span> Costos</li>
+        <li><span>07</span> Terceros</li>
       </ol>
     </section>
 
@@ -240,6 +241,7 @@
             </div>
           </header>
           <div class='section-body'>
+            <p class='helper'>Incluye solo servicios que prestas tú. Los pagos obligatorios a Apple, Google u otros proveedores externos van en la sección 07.</p>
             <div class='items-head' aria-hidden='true'>
               <span>Concepto</span><span>Cant.</span><span>Precio</span><span>Tipo</span><span>Total</span><span>Acciones</span>
             </div>
@@ -378,6 +380,44 @@
             </div>
           </div>
         </section>
+        <section id='section-third-party' data-od-id='third-party' class='card section-card'>
+          <header class='section-head'>
+            <div class='section-heading'>
+              <span class='section-number' aria-hidden='true'>07</span>
+              <div>
+                <h2 class='section-title'>Costos de terceros</h2>
+                <p class='section-copy'>Pagos obligatorios a Apple, Google u otros proveedores externos. Van aparte en el PDF, con su propio total, y no forman parte de tus servicios.</p>
+              </div>
+            </div>
+            <div class='section-actions'>
+              <button id='addThirdPartyBtn' type='button' class='btn btn-secondary btn-sm' title='Agregar costo de terceros' aria-label='Agregar costo de terceros'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M10 4v12M4 10h12' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/></svg>
+                Agregar costo
+              </button>
+              <button type='button' class='clear-section-btn icon-btn danger' data-section='thirdPartyCosts' data-tooltip='Limpiar costos de terceros' title='Limpiar costos de terceros' aria-label='Limpiar costos de terceros'>
+                <svg class='icon' viewBox='0 0 20 20' aria-hidden='true'><path d='M4 6h12M8 6V4h4v2m-7 0 1 10h8l1-10' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>
+              </button>
+            </div>
+          </header>
+          <div class='section-body'>
+            <p id='thirdPartyHelp' class='helper'>El cliente los paga directamente al proveedor. Los montos pueden variar según la cuenta, el país y las políticas vigentes.</p>
+            <div class='third-party-head' aria-hidden='true'>
+              <span>Concepto</span><span>Monto</span><span>Periodicidad</span><span>Total</span><span>Acciones</span>
+            </div>
+            <div id='thirdPartyList' class='items-list'></div>
+            <div id='thirdPartyEmpty' class='empty-state hidden'>
+              <p class='empty-title'>Sin costos de terceros</p>
+              <p class='empty-copy'>Agrega licencias o pagos obligatorios de App Store, Play Store u otros proveedores. Se muestran aparte y no se suman a tus servicios.</p>
+              <div class='empty-actions'>
+                <button type='button' class='btn btn-secondary' data-action='add-third-party'>Agregar costo</button>
+              </div>
+            </div>
+            <div class='third-party-total-line'>
+              <span>Total referencial de terceros</span>
+              <strong id='thirdPartyTotalInline'>S/ 0.00</strong>
+            </div>
+          </div>
+        </section>
       </div>
       <aside id='summaryPanel' data-od-id='summary' class='summary' aria-label='Resumen de la cotización'>
         <div class='summary-sheet'>
@@ -418,6 +458,11 @@
             <div class='summary-row'><span>Margen %</span><strong id='marginPercent'>—</strong></div>
           </div>
 
+          <div class='summary-third-party' aria-live='polite'>
+            <p class='summary-mini-label'>Costos de terceros · no incluidos</p>
+            <div class='summary-row'><span>Total referencial</span><strong id='thirdPartyTotal'>S/ 0.00</strong></div>
+          </div>
+
           <div class='summary-delivery'>
             <span class='summary-mini-label'>Entrega estimada</span>
             <p id='deliveryPreview'>Define fecha de inicio y plazo.</p>
@@ -456,6 +501,7 @@
                 <label class='check-row'><input class='cache-section' type='checkbox' value='project' checked /> Proyecto y fechas</label>
                 <label class='check-row'><input class='cache-section' type='checkbox' value='schedule' checked /> Cronograma</label>
                 <label class='check-row'><input class='cache-section' type='checkbox' value='costs' checked /> Costos</label>
+                <label class='check-row'><input class='cache-section' type='checkbox' value='thirdPartyCosts' checked /> Costos de terceros</label>
               </div>
               <button id='saveCacheBtn' type='button' class='btn btn-secondary btn-full'>Guardar selección</button>
               <button id='clearAllCacheBtn' type='button' class='btn btn-danger-ghost btn-full'>Borrar todos los datos</button>
@@ -554,6 +600,13 @@ Si mi prompt menciona ciudad, país o mercado objetivo, úsalo como referencia p
       &quot;periodicidad&quot;: &quot;monthly&quot;
     }
   ],
+  &quot;costosTerceros&quot;: [
+    {
+      &quot;concepto&quot;: &quot;Licencia o pago obligatorio a un proveedor externo&quot;,
+      &quot;monto&quot;: 99,
+      &quot;periodicidad&quot;: &quot;annual&quot;
+    }
+  ],
   &quot;cronograma&quot;: [
     {
       &quot;etapa&quot;: 1,
@@ -571,7 +624,9 @@ Valores permitidos y reglas:
 - periodicidad: monthly, annual o one_time.
 - abonoInicial y abono: montos fijos, nunca porcentajes.
 - cantidad y precio deben ser números mayores o iguales a 0.
+- items: solo servicios que presta el desarrollador. Si ofrece hosting, servidor, mantenimiento o automatización recurrente, inclúyelo como ítem y aclara la mensualidad en el concepto o la descripción.
 - costos: gastos internos del proveedor (suscripciones, servidores, licencias). No son precios cobrados al cliente y no se muestran en el PDF; si no aplica, deja la lista vacía.
+- costosTerceros: pagos obligatorios a proveedores externos (Apple App Store, Google Play, licencias de terceros, trámites). No los incluyas en items; se muestran aparte con su propio total y los asume el cliente. Si no aplica, deja la lista vacía.
 - Las fechas deben usar el formato YYYY-MM-DD.
 - Redacta conceptos, descripciones, alcance general, entregables y condiciones para que un cliente no técnico entienda qué está pagando.
 - Ajusta precios, plazos y cronograma al mercado indicado por el usuario cuando exista esa información.

@@ -117,6 +117,13 @@ function calculate() {
     const cost = state.costs[index];
     if (cost) element.textContent = money(costRowTotal(cost, costValues.months));
   });
+  document.querySelectorAll('.third-party-row-total').forEach((element, index) => {
+    const cost = state.thirdPartyCosts[index];
+    if (cost) element.textContent = money(thirdPartyRowTotal(cost));
+  });
+  const thirdPartyValue = thirdPartyTotal();
+  if (els.thirdPartyTotal) els.thirdPartyTotal.textContent = money(thirdPartyValue);
+  if (els.thirdPartyTotalInline) els.thirdPartyTotalInline.textContent = money(thirdPartyValue);
   els.clientPreview.textContent = els.clientName.value
     ? `${els.clientName.value}${els.clientRuc.value ? ' · RUC ' + els.clientRuc.value : ''}`
     : 'Completa el cliente para personalizar la cotización.';
